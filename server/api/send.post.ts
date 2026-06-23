@@ -1,28 +1,44 @@
 // server/api/invoice/send.post.ts
 
 import { Resend } from 'resend'
+import puppeteer from 'puppeteer'
 import { generateInvoicePdf } from '../utils/generateInvoice'
 
 const resend = new Resend(process.env.RESEND_API_KEY)
 
 export default defineEventHandler(async (event) => {
-  const invoice = await readBody(event)
+ const invoice = await readBody(event)
 
-  const html = `
-    <h1>Faktura</h1>
-    <p>${invoice.customerName}</p>
-  `
+  const encodedInvoice = encodeURIComponent(
+    JSON.stringify(invoice)
+  )
 
-  const pdf = await generateInvoicePdf(html)
+  const browser = await puppeteer.launch()
+
+  const page = await browser.newPage()
+
+  await page.goto(
+    `http://localhost:3000/invoice/preview?invoice=${encodedInvoice}`,
+    {
+      waitUntil: 'networkidle0'
+    }
+  )
+
+  const pdf = await page.pdf({
+    format: 'A4',
+    printBackground: true
+  })
+
+  await browser.close()
 
   await resend.emails.send({
     from: 'onboarding@resend.dev',
-    to: invoice.customerEmail,
-    subject: 'Din faktura',
+    to: 'jeppe-steen@live.dk',
+    subject: `Faktura ${invoice.invoiceDetails.number}`,
     html: '<p>Vedhæftet finder du din faktura.</p>',
     attachments: [
       {
-        filename: 'faktura.pdf',
+        filename: `faktura-${invoice.invoiceDetails.number}.pdf`,
         content: Buffer.from(pdf)
       }
     ]
