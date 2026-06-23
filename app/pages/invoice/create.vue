@@ -1,6 +1,6 @@
 <script setup>
 import { useInvoice } from '../../composables/useInvoice';
-const { invoice, addItem } = useInvoice();
+const { invoice, addItem, removeItem } = useInvoice();
 
 const downloadInvoice = async () => {
     const response = await fetch('/api/download', {
@@ -42,23 +42,41 @@ const sendInvoice = async () => {
     </header>
 
     <section class="invoice-fields">
-        <input type="text" placeholder="Faktura nr." :value="invoice.invoiceDetails.number" @input="invoice.invoiceDetails.number = $event.target.value">
-        <input type="text" placeholder="Kunde navn" :value="invoice.customer.name" @input="invoice.customer.name = $event.target.value">
-        <input type="text" placeholder="Kunde adresse" :value="invoice.customer.address" @input="invoice.customer.address = $event.target.value">
-        <br>
-        <input type="text" placeholder="Firma navn" :value="invoice.firm.name" @input="invoice.firm.name = $event.target.value">
-        <input type="text" placeholder="Firma ejer" :value="invoice.firm.owner" @input="invoice.firm.owner = $event.target.value">
-        <input type="text" placeholder="Firma adresse" :value="invoice.firm.address" @input="invoice.firm.address = $event.target.value">
-        <input type="text" placeholder="Firma telefon" :value="invoice.firm.phone" @input="invoice.firm.phone = $event.target.value">
-        <input type="text" placeholder="Firma email" :value="invoice.firm.email" @input="invoice.firm.email = $event.target.value">
-        <input type="text" placeholder="Firma cvr" :value="invoice.firm.cvr" @input="invoice.firm.cvr = $event.target.value">
-        <br>
-        <UiButton label="tilføj" @click-event="addItem"/>
-        <span v-for="(item, itemIndex) in invoice.items">
-            <input type="text" placeholder="Vare" :value="invoice.items[itemIndex].name" @input="invoice.items[itemIndex].name = $event.target.value">
-            <input type="text" placeholder="Mængde" :value="invoice.items[itemIndex].quantity" @input="invoice.items[itemIndex].quantity = $event.target.value">
-            <input type="text" placeholder="Pris" :value="invoice.items[itemIndex].price" @input="invoice.items[itemIndex].price = $event.target.value">
-        </span>
+        <article class="invoice-fields--customer">
+            <h2>Kunde oplysninger:</h2>
+            <span>
+                <UiInput label="Faktura nr.:" placeholder="Fx. 100" v-model="invoice.invoiceDetails.number" rounded/>
+                <UiInput label="Kundens navn:" placeholder="Fx. John Doe" v-model="invoice.customer.name" rounded/>
+                <UiInput label="Kundens adresse:" placeholder="Fx. Vesterbro 1, 9000 Aalborg" v-model="invoice.customer.address" rounded/>
+            </span>
+        </article>
+
+        <article class="invoice-fields--firm">
+            <h2>Virksomheds oplysninger:</h2>
+            <span>
+                <UiInput label="Virksomheds navn:" placeholder="Fx. Min butik" v-model="invoice.firm.name" rounded/>
+                <UiInput label="Virksomheds ejer:" placeholder="Fx. John Doe" v-model="invoice.firm.owner" rounded/>
+                <UiInput label="Virksomheds adresse:" placeholder="Fx. Vesterbro 2, 9000 Aalborg" v-model="invoice.firm.address" rounded/>
+                <UiInput label="Virksomheds telefon nr.:" placeholder="Fx. 10101010" v-model="invoice.firm.phone" rounded/>
+                <UiInput label="Virksomheds email:" placeholder="Fx. john.doe@mail.com" v-model="invoice.firm.email" rounded/>
+                <UiInput label="Virksomheds CVR:" placeholder="Fx. 10101010" v-model="invoice.firm.cvr" rounded/>
+            </span>
+        </article>
+
+        <article class="invoice-fields--items">
+            <header>
+                <h2>Materialer</h2>
+                <UiButton label="Tilføj vare" @click-event="addItem" />
+            </header>
+            <span>
+                <div v-for="(item, itemIndex) in invoice.items">
+                    <UiInput label="Vare navn:" placeholder="Fx. arbejdstimer" v-model="invoice.items[itemIndex].name" rounded/>
+                    <UiInput label="Vare antal:" placeholder="Fx. 10" v-model="invoice.items[itemIndex].quantity" rounded/>
+                    <UiInput label="Vare pris:" placeholder="Fx. 100" v-model="invoice.items[itemIndex].price" rounded/>
+                    <UiButton label="Slet vare" @click-event="removeItem(itemIndex)"  styling="danger" size="tiny"/>
+                </div>
+            </span>
+        </article>
     </section>
 </template>
 
@@ -76,12 +94,40 @@ const sendInvoice = async () => {
     }
 
     .invoice-fields {
-        display: flex;
-        flex-direction: column;
-        gap: 1rem;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        grid-template-areas: 
+            'customer firm'
+            'items items'
+        ;
+        gap: 2rem;
 
-        input {
-            padding: 0.5rem;
+        &--customer { grid-area: customer;}
+
+        &--firm { grid-area: firm }
+
+        &--items { 
+            grid-area: items;
+
+            header {
+                display: flex;
+                flex-direction: row;
+                justify-content: space-between;
+                height: 40px;
+            }
+
+            span {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 1rem;
+
+                div {
+                    display: flex;
+                    flex-direction: column;
+                    gap: 1rem;
+                    padding: 1rem;
+                }
+            }
         }
     }
 </style>
