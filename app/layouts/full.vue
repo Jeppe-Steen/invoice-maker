@@ -30,9 +30,9 @@
         background-color: var(--background-color);
 
         display: grid;
-        grid-template-columns: 1fr minmax(0, 70%) 1fr;
+        grid-template-columns: 100%;
         gap: 1rem;
-        grid-template-areas: '. content .';
+        grid-template-areas: 'content';
 
         &--content {
             grid-area: content;
