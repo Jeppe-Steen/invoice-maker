@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import { useInvoice } from '../../composables/useInvoice';
 const { invoice, addItem, removeItem } = useInvoice();
 
@@ -17,7 +17,7 @@ const downloadInvoice = async () => {
 
     const a = document.createElement('a')
     a.href = url
-    a.download = 'faktura.pdf'
+    a.download = `faktura-`+ invoice.value.invoiceDetails.number + `.pdf`
     a.click()
 
     URL.revokeObjectURL(url)
@@ -28,6 +28,24 @@ const sendInvoice = async () => {
         method: 'POST',
         body: invoice.value
     })
+}
+
+const subtotal = computed(() => {
+    return invoice.value.items.reduce((sum: number, item: any) => {
+        return sum + Number(item.price) * Number(item.quantity)
+    }, 0)
+})
+
+const tax = computed(() => {
+    return subtotal.value * 0.25
+})
+
+const total = computed(() => {
+    return subtotal.value + tax.value
+})
+
+const getItemTotal = (item: any) => {
+    return Number(item.price) * Number(item.quantity)
 }
 
 </script>
@@ -68,14 +86,40 @@ const sendInvoice = async () => {
                 <h2>Materialer</h2>
                 <UiButton label="Tilføj vare" @click-event="addItem" />
             </header>
-            <span>
-                <div v-for="(item, itemIndex) in invoice.items">
-                    <UiInput label="Vare navn:" placeholder="Fx. arbejdstimer" v-model="invoice.items[itemIndex].name" rounded/>
-                    <UiInput label="Vare antal:" placeholder="Fx. 10" v-model="invoice.items[itemIndex].quantity" rounded/>
-                    <UiInput label="Vare pris:" placeholder="Fx. 100" v-model="invoice.items[itemIndex].price" rounded/>
-                    <UiButton label="Slet vare" @click-event="removeItem(itemIndex)"  styling="danger" size="tiny"/>
-                </div>
-            </span>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Varer</th>
+                        <th>Antal</th>
+                        <th>Pris</th>
+                        <th>Total</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr v-for="(item, itemIndex) in invoice.items">
+                        <td colspan="1"><UiInput placeholder="Fx. arbejdstimer" v-model="invoice.items[itemIndex]!.name" rounded/></td>
+                        <td colspan="1"><UiInput placeholder="Fx. 10" v-model="invoice.items[itemIndex]!.quantity" rounded/></td>
+                        <td colspan="1"><UiInput placeholder="Fx. 100" v-model="invoice.items[itemIndex]!.price" rounded/></td>
+                        <td colspan="1">{{ getItemTotal(item) }} {{ invoice.invoiceDetails.currency }}</td>
+                        <td colspan="1"> <UiButton label="Slet" @click-event="removeItem(itemIndex)"  styling="danger" size="tiny"/></td>
+                    </tr>
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <th colspan="3">Pris eksl. moms</th>
+                        <td>{{ subtotal }} {{ invoice.invoiceDetails.currency }}</td>
+                    </tr>
+                    <tr>
+                        <th colspan="3">Moms</th>
+                        <td>{{ tax }} {{ invoice.invoiceDetails.currency }}</td>
+                    </tr>
+                    <tr>
+                        <th colspan="3">Pris incl. moms</th>
+                        <th>{{ total }} {{ invoice.invoiceDetails.currency }}</th>
+                    </tr>
+                </tfoot>
+            </table>
         </article>
     </section>
 </template>
@@ -102,12 +146,33 @@ const sendInvoice = async () => {
         ;
         gap: 2rem;
 
-        &--customer { grid-area: customer;}
+        &--customer { 
+            grid-area: customer;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
 
-        &--firm { grid-area: firm }
+            span {
+                display: flex; flex-direction: column; gap: 1rem;
+            }
+        }
+
+        &--firm { 
+            grid-area: firm;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+
+            span {
+                display: flex; flex-direction: column; gap: 1rem;
+            } 
+        }
 
         &--items { 
             grid-area: items;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
 
             header {
                 display: flex;
@@ -116,16 +181,35 @@ const sendInvoice = async () => {
                 height: 40px;
             }
 
-            span {
-                display: grid;
-                grid-template-columns: 1fr 1fr;
-                gap: 1rem;
+            table {
+                width: 100%;
 
-                div {
-                    display: flex;
-                    flex-direction: column;
-                    gap: 1rem;
-                    padding: 1rem;
+                th, td {
+                    padding: .5rem;
+                    text-align: center;
+                }
+
+                thead {
+                    background-color: #0D0E10;
+                    color: #FAFAFA;
+                }
+
+                tbody {
+                    tr {
+                        background-color: #c6c6c6;
+
+                        &:nth-child(odd) {
+                            background-color: #e2e2e2;
+                        }
+                        
+                        td {
+                            width: calc(90%/4);
+
+                            &:last-of-type {
+                                width: 10%;
+                            }
+                        }
+                    }
                 }
             }
         }

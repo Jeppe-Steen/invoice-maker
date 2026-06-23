@@ -142,7 +142,7 @@
                     tr {
                         background-color: #c6c6c6;
 
-                        &:nth-child(2) {
+                        &:nth-child(odd) {
                             background-color: #e2e2e2;
                         }  
                     }
