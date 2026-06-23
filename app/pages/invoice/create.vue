@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { useInvoice } from '../../composables/useInvoice';
-const { invoice, addItem, removeItem } = useInvoice();
+const { invoice, addItem, removeItem, resetInvoice } = useInvoice();
 
 const downloadInvoice = async () => {
     const response = await fetch('/api/download', {
@@ -54,6 +54,7 @@ const getItemTotal = (item: any) => {
     <header class="invoice-header">
         <h1>Creating invoices</h1>
         <span>
+            <UiButton label="Ny Faktura" styling="secondary" @click-event="resetInvoice" />
             <UiButton label="Send" styling="secondary" @click-event="sendInvoice" />
             <UiButton label="Download" @click-event="downloadInvoice" />
         </span>
@@ -185,13 +186,16 @@ const getItemTotal = (item: any) => {
                 width: 100%;
 
                 th, td {
-                    padding: .5rem;
                     text-align: center;
                 }
 
                 thead {
                     background-color: #0D0E10;
                     color: #FAFAFA;
+
+                    th {
+                        padding: .5rem;
+                    }
                 }
 
                 tbody {
@@ -207,8 +211,15 @@ const getItemTotal = (item: any) => {
 
                             &:last-of-type {
                                 width: 10%;
+                                padding: .5rem;
                             }
                         }
+                    }
+                }
+
+                tfoot {
+                    th, td {
+                        padding: .5rem;
                     }
                 }
             }
