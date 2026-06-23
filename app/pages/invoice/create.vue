@@ -52,7 +52,7 @@ const getItemTotal = (item: any) => {
 
 <template>
     <header class="invoice-header">
-        <h1>Creating invoices</h1>
+        <h1>Opret faktura</h1>
         <span>
             <UiButton label="Ny Faktura" styling="secondary" @click-event="resetInvoice" />
             <UiButton label="Send" styling="secondary" @click-event="sendInvoice" />
