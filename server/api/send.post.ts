@@ -2,7 +2,6 @@
 
 import { Resend } from 'resend'
 import puppeteer from 'puppeteer'
-import { generateInvoicePdf } from '../utils/generateInvoice'
 
 const resend = new Resend(process.env.RESEND_API_KEY)
 
