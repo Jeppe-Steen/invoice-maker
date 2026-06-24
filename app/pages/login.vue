@@ -1,4 +1,6 @@
 <script setup>
+    import {useAuth} from '~/composables/useAuth';
+    const { loginAnonymously } = useAuth();
     definePageMeta({
         layout: 'login',
     })
@@ -10,11 +12,6 @@
 
     const LoginAsCustomer = () => {
         console.log('Customer login', loginCodentials.value);
-        return;
-    }
-
-    const loginAsGuest = () => {
-        console.log('Guest login');
         return;
     }
     
@@ -31,13 +28,13 @@
         <article>
             <UiInput placeholder="E-mail" v-model="loginCodentials.mail" rounded/>
             <UiInput placeholder="Password" v-model="loginCodentials.password" rounded/>
-            <UiButton label="Log ind" @click-event="LoginAsCustomer"/>
+            <UiButton label="Log ind" @click-event="() => {console.log('heeeeey')}"/>
         </article>
 
         <div class="divider"></div>
 
         <article>
-            <UiButton label="Fortsæt som gæst" styling="secondary" @click-event="loginAsGuest"/>
+            <UiButton label="Fortsæt som gæst" styling="secondary" @click-event="loginAnonymously"/>
         </article>
 
         <span class="small-text">

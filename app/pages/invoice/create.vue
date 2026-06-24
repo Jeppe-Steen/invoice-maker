@@ -2,6 +2,10 @@
 import { useInvoice } from '../../composables/useInvoice';
 const { invoice, addItem, removeItem, resetInvoice } = useInvoice();
 
+definePageMeta({
+    middleware: ['auth']
+})
+
 const downloadInvoice = async () => {
     const response = await fetch('/api/download', {
         method: 'POST',
@@ -208,7 +212,7 @@ const getItemTotal = (item: any) => {
                         }
                         
                         td {
-                            width: calc(90%/4);
+                            width: 1fr;
 
                             &:last-of-type {
                                 width: 10%;
