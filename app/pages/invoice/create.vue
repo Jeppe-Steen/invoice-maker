@@ -55,6 +55,7 @@ const getItemTotal = (item: any) => {
         <h1>Opret faktura</h1>
         <span>
             <UiButton label="Ny Faktura" styling="secondary" @click-event="resetInvoice" />
+            <UiButton label="Gem" styling="secondary" @click-event="() => {console.log('gem')}" />
             <UiButton label="Send" styling="secondary" @click-event="sendInvoice" />
             <UiButton label="Download" @click-event="downloadInvoice" />
         </span>
@@ -103,7 +104,7 @@ const getItemTotal = (item: any) => {
                         <td colspan="1"><UiInput placeholder="Fx. 10" v-model="invoice.items[itemIndex]!.quantity" rounded/></td>
                         <td colspan="1"><UiInput placeholder="Fx. 100" v-model="invoice.items[itemIndex]!.price" rounded/></td>
                         <td colspan="1">{{ getItemTotal(item) }} {{ invoice.invoiceDetails.currency }}</td>
-                        <td colspan="1"> <UiButton label="Slet" @click-event="removeItem(itemIndex)"  styling="danger" size="tiny"/></td>
+                        <td colspan="1"> <UiButton label="X" @click-event="removeItem(itemIndex)" styling="danger" size="tiny"/></td>
                     </tr>
                 </tbody>
                 <tfoot>
