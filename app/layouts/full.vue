@@ -1,8 +1,8 @@
 <script setup>
     const navItems = [
-        {label: 'Home', to: '/', type: 'link', styling: 'link', size: 'tiny' },
-        {label: 'Dashboard', to: '/dashboard', type: 'link', styling: 'link', size: 'tiny' },
-        {label: 'Invoice', to: '/invoice/create', type: 'link', styling: 'link', size: 'tiny' },
+        {label: 'Forside', to: '/', type: 'link', styling: 'link', size: 'tiny' },
+        {label: 'Overblik', to: '/dashboard', type: 'link', styling: 'link', size: 'tiny' },
+        {label: 'Opret faktura', to: '/invoice/create', type: 'link', styling: 'link', size: 'tiny' },
         {label: 'log ind', to: '/login', type: 'link' },
     ]
 </script>

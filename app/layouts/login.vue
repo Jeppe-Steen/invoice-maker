@@ -1,9 +1,6 @@
 <script setup>
     const navItems = [
-        {label: 'Forside', to: '/', type: 'link', styling: 'link', size: 'tiny' },
-        {label: 'Overblik', to: '/dashboard', type: 'link', styling: 'link', size: 'tiny' },
-        {label: 'Opret faktura', to: '/invoice/create', type: 'link', styling: 'link', size: 'tiny' },
-        {label: 'log ind', to: '/login', type: 'link' },
+        {label: 'Tilbage til forsiden', to: '/', type: 'link' },
     ]
 </script>
 
@@ -19,14 +16,12 @@
             <slot></slot>
         </div>
     </main>
-
-    <UiFooter />
 </template>
 
 <style scoped lang="scss">
     .content-container {
         width: 100%;
-        min-height: 100vh;
+        min-height: 90vh;
         background-color: var(--background-color);
         padding: 2rem;
 
@@ -38,8 +33,8 @@
         &--content {
             grid-area: content;
             display: flex;
-            flex-direction: column;
-            gap: 1rem;
+            align-items: center;
+            justify-content: center;
         }
 
     }
