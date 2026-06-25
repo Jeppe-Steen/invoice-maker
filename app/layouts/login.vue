@@ -1,16 +1,4 @@
-<script setup>
-    const navItems = [
-        {label: 'Tilbage til forsiden', to: '/', type: 'link' },
-    ]
-</script>
-
 <template>
-    <UiNavigation :navItems="navItems">
-        <template #icon>
-            <h2>InvoiceMaker</h2>
-        </template>
-    </UiNavigation>
-
     <main class="content-container">
         <div class="content-container--content">
             <slot></slot>

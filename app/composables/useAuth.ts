@@ -1,5 +1,10 @@
 export const useAuth = () => {
     const supabase = useSupabaseClient()
+
+    const user = useSupabaseUser()
+    const isLoggedIn = computed(() => !!user.value)
+    const isAnonymous = computed(() => user.value?.is_anonymous)
+    const isRegisteredUser = computed(() => !user.value?.is_anonymous)
     
     const loginAnonymously = async () => {
         console.log('click')
@@ -32,6 +37,10 @@ export const useAuth = () => {
     };
 
     return {
+        isLoggedIn,
+        isAnonymous,
+        isRegisteredUser,
+
         loginAnonymously,
         signInWithEmail
     }
