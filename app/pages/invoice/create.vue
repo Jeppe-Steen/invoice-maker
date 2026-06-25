@@ -58,10 +58,25 @@ const getItemTotal = (item: any) => {
     <header class="invoice-header">
         <h1>Opret faktura</h1>
         <span>
-            <UiButton label="Ny Faktura" styling="secondary" @click-event="resetInvoice" />
-            <UiButton label="Gem" styling="secondary" @click-event="() => {console.log('gem')}" />
-            <UiButton label="Send" styling="secondary" @click-event="sendInvoice" />
-            <UiButton label="Download" @click-event="downloadInvoice" />
+            <UiButton
+                label="Ny Faktura"
+                styling="secondary"
+                @click="resetInvoice"
+            />
+            <UiButton
+                label="Gem"
+                styling="secondary"
+                @click="() => {console.log('gem')}"
+            />
+            <UiButton
+                label="Send"
+                styling="secondary"
+                @click="sendInvoice" 
+            />
+            <UiButton
+                label="Download"
+                @click="downloadInvoice"
+            />
         </span>
     </header>
 
@@ -90,7 +105,10 @@ const getItemTotal = (item: any) => {
         <article class="invoice-fields--items">
             <header>
                 <h2>Materialer</h2>
-                <UiButton label="Tilføj vare" @click-event="addItem" />
+                <UiButton
+                    label="Tilføj vare"
+                    @click="addItem"
+                />
             </header>
 
             <table>
@@ -108,7 +126,7 @@ const getItemTotal = (item: any) => {
                         <td colspan="1"><UiInput placeholder="Fx. 10" v-model="invoice.items[itemIndex]!.quantity" rounded/></td>
                         <td colspan="1"><UiInput placeholder="Fx. 100" v-model="invoice.items[itemIndex]!.price" rounded/></td>
                         <td colspan="1">{{ getItemTotal(item) }} {{ invoice.invoiceDetails.currency }}</td>
-                        <td colspan="1"> <UiButton label="X" @click-event="removeItem(itemIndex)" styling="danger" size="tiny"/></td>
+                        <td colspan="1"> <UiButton label="X" @click="removeItem(itemIndex)" styling="danger" size="small"/></td>
                     </tr>
                 </tbody>
                 <tfoot>

@@ -7,17 +7,13 @@ export const useAuth = () => {
     const isRegisteredUser = computed(() => !user.value?.is_anonymous)
     
     const loginAnonymously = async () => {
-        console.log('click')
         const { data, error } = await supabase.auth.signInAnonymously();
         if (error) {
             console.log(error);
             return;
         }
 
-        console.log('success');
-
         await navigateTo('/invoice/create');
-        return;
     }
 
     const signInWithEmail = async (mail: string, pass: string) => {
@@ -31,10 +27,19 @@ export const useAuth = () => {
             return;
         }
 
-        console.log('success', data);
-        // window.location.href = "/dashboard"
-        return;
+        await navigateTo('/dashboard');
     };
+
+    const logout = async () => {
+        const { error } = await supabase.auth.signOut()
+
+        if (error) {
+        console.error(error)
+        return
+        }
+
+        await navigateTo('/')
+    }
 
     return {
         isLoggedIn,
@@ -42,6 +47,7 @@ export const useAuth = () => {
         isRegisteredUser,
 
         loginAnonymously,
-        signInWithEmail
+        signInWithEmail,
+        logout
     }
 }

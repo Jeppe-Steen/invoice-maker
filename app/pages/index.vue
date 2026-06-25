@@ -1,4 +1,6 @@
 <script setup>
+    import { useAuth } from '~/composables/useAuth'
+    const { loginAnonymously } = useAuth();
     definePageMeta({
         layout: 'full',
     })
@@ -8,11 +10,6 @@
         { heading: 'Hurtig fakturering', text: 'På bare få minutter, er du allerede igang med at hente og sende din første faktura.' },
         { heading: 'Økonomisk overblik', text: 'Se samlet overblik over hvormeget du har har faktureret for.' },
     ];
-
-    const loginAsGuest = () => {
-        console.log('Guest login');
-        return;
-    }
 </script>
 
 <template>
@@ -25,8 +22,15 @@
             </span>
         </header>
         <span>
-            <UiButton label="Start som gæst" styling="secondary" @click-event="loginAsGuest"/>
-            <UiButton label="Log ind" type="link" to="/login"/>
+            <UiButton
+                label="Start som gæst"
+                styling="secondary"
+                @click="loginAnonymously"
+            />
+            <UiButton
+                label="Log ind"
+                to="/login"
+            />
         </span>
     </section>
 
@@ -46,7 +50,13 @@
         <header>
             <h2>Klar til at oprette din første faktura?</h2>
         </header>
-        <UiButton label="Kun et klik væk - Opret nu" size="big" type="link" to="/login"/>
+        <span>
+            <UiButton
+                label="Kun et klik væk - Opret nu"
+                size="big"
+                to="/login"
+            />
+       </span>
     </section>
 </template>
 
