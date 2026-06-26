@@ -1,9 +1,25 @@
 <script setup lang="ts">
-import { useInvoice } from '../../composables/useInvoice';
-const { invoice, addItem, removeItem, resetInvoice } = useInvoice();
+import { useInvoice } from '~/composables/useInvoice';
+import { useProfile } from '~/composables/useProfile';
+import { useAuth } from '~/composables/useAuth';
+
+
+const { invoice, addItem, removeItem, resetInvoice, applyProfile, loadNextInvoiceNumber } = useInvoice()
+const { profile, loadProfile } = useProfile()
+const { isRegisteredUser } = useAuth()
 
 definePageMeta({
     middleware: ['auth']
+})
+
+onMounted(async () => {
+  await loadProfile()
+
+  if (profile.value) {
+    applyProfile(profile.value)
+  }
+
+  await loadNextInvoiceNumber()
 })
 
 const downloadInvoice = async () => {
@@ -52,6 +68,13 @@ const getItemTotal = (item: any) => {
     return Number(item.price) * Number(item.quantity)
 }
 
+const buttons = computed(() => [
+    { label: 'Ny faktura', styling: 'secondary', action: resetInvoice, show: true},
+    { label: 'Gem', styling: 'secondary', action: () => {console.log('teeest')}, show: isRegisteredUser.value },
+    { label: 'Send', styling: 'secondary', action: sendInvoice, show: isRegisteredUser.value},
+    { label: 'Download', action: downloadInvoice, show: true },
+].filter(item => item.show ?? true));
+
 </script>
 
 <template>
@@ -59,23 +82,12 @@ const getItemTotal = (item: any) => {
         <h1>Opret faktura</h1>
         <span>
             <UiButton
-                label="Ny Faktura"
-                styling="secondary"
-                @click="resetInvoice"
-            />
-            <UiButton
-                label="Gem"
-                styling="secondary"
-                @click="() => {console.log('gem')}"
-            />
-            <UiButton
-                label="Send"
-                styling="secondary"
-                @click="sendInvoice" 
-            />
-            <UiButton
-                label="Download"
-                @click="downloadInvoice"
+                v-for="btn in buttons"
+                :key="btn.label"
+                :label="btn.label"
+                :styling="btn.styling"
+                :show="btn.show"
+                @click="btn.action?.()"
             />
         </span>
     </header>

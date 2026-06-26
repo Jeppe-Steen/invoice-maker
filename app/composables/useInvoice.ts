@@ -36,6 +36,7 @@ const defaultInvoice = () => ({
 export const useInvoice = () => {
   const invoice = useState('invoice', () => defaultInvoice());
   const initialized = useState('initialized', () => false);
+  const supabase = useSupabaseClient()
 
   onMounted(() => {
     const savedInvoice = localStorage.getItem('invoice')
@@ -58,6 +59,46 @@ export const useInvoice = () => {
     }
   })
 
+  const loadNextInvoiceNumber = async () => {
+    const {
+      data: { user }
+    } = await supabase.auth.getUser()
+
+    if (!user || user.is_anonymous) {
+      invoice.value.invoiceDetails.number = 1
+      return
+    }
+
+    const { data, error } = await supabase
+      .from('invoices')
+      .select('invoice_number')
+      .eq('user_id', user.id)
+      .order('invoice_number', { ascending: false })
+      .limit(1)
+      .maybeSingle()
+
+    const lastInvoice = data as { invoice_number: number } | null
+
+    if (error) {
+      console.error(error)
+      return
+    }
+
+    invoice.value.invoiceDetails.number = lastInvoice
+      ? lastInvoice.invoice_number + 1
+      : 1
+  }
+  const applyProfile = (profile: any) => {
+    invoice.value.firm.name = profile.company_name
+    invoice.value.firm.owner = profile.owner_name
+    invoice.value.firm.address = profile.address
+    invoice.value.firm.phone = profile.phone
+    invoice.value.firm.email = profile.email
+    invoice.value.firm.cvr = profile.cvr
+    invoice.value.invoiceDetails.terms = profile.terms
+    invoice.value.invoiceDetails.bank = profile.bank
+    invoice.value.invoiceDetails.reminder = profile.reminder
+  }
   const addItem = () => {
     invoice.value.items.push({
       name: 'Ny vare',
@@ -65,11 +106,9 @@ export const useInvoice = () => {
       price: 0
     })
   }
-
   const removeItem = (index: number) => {
     invoice.value.items.splice(index, 1)
   }
-
   const resetInvoice = () => {
     invoice.value = defaultInvoice()
 
@@ -86,5 +125,7 @@ export const useInvoice = () => {
     removeItem,
 
     resetInvoice,
+    applyProfile,
+    loadNextInvoiceNumber
   }
 }

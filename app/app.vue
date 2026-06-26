@@ -5,7 +5,7 @@
 
   const navLinks = computed(() => [
       {label: 'Forside', to: '/', styling: 'link', show: true },
-      {label: 'Overblik', to: '/dashboard', styling: 'link', show: isRegisteredUser.value },
+      {label: 'Overblik', to: '/dashboard', styling: 'link', show: isLoggedIn.value && isRegisteredUser.value },
       {label: 'Opret faktura', to: '/invoice/create', styling: 'link', show: true },
       {label: 'Log ind', to: '/login', show: !isLoggedIn.value, size: 'medium' },
       {label: 'Log ud', show: isLoggedIn.value, action: logout, size: 'medium' },

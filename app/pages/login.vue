@@ -1,6 +1,6 @@
 <script setup>
     import { useAuth } from '~/composables/useAuth';
-    const { loginAnonymously } = useAuth();
+    const { loginAnonymously, loginWithEmail } = useAuth();
 
     definePageMeta({
         layout: 'login',
@@ -36,7 +36,7 @@
             <UiButton
                 label="Log ind"
                 size="big"
-                @click="() => {console.log('heeeeey')}"
+                @click="loginWithEmail(loginCodentials.mail, loginCodentials.password)"
             />
         </article>
 

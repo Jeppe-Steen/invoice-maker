@@ -1,4 +1,9 @@
+import {useProfile} from '~/composables/useProfile'
+import {useInvoice} from '~/composables/useInvoice'
+
 export const useAuth = () => {
+    const { clearProfile } = useProfile()
+    const { resetInvoice } = useInvoice()
     const supabase = useSupabaseClient()
 
     const user = useSupabaseUser()
@@ -16,7 +21,7 @@ export const useAuth = () => {
         await navigateTo('/invoice/create');
     }
 
-    const signInWithEmail = async (mail: string, pass: string) => {
+    const loginWithEmail = async (mail: string, pass: string) => {
         const { data, error } = await supabase.auth.signInWithPassword({
             email: mail,
             password: pass,
@@ -34,9 +39,12 @@ export const useAuth = () => {
         const { error } = await supabase.auth.signOut()
 
         if (error) {
-        console.error(error)
-        return
+            console.error(error)
+            return
         }
+
+        clearProfile()
+        resetInvoice()
 
         await navigateTo('/')
     }
@@ -47,7 +55,7 @@ export const useAuth = () => {
         isRegisteredUser,
 
         loginAnonymously,
-        signInWithEmail,
+        loginWithEmail,
         logout
     }
 }
