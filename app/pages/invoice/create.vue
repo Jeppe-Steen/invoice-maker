@@ -3,8 +3,22 @@ import { useInvoice } from '~/composables/useInvoice';
 import { useProfile } from '~/composables/useProfile';
 import { useAuth } from '~/composables/useAuth';
 
+const { 
+    invoice,
+    subtotal, 
+    tax, 
+    total, 
+    getItemTotal,
+    addItem, 
+    removeItem, 
+    resetInvoice, 
+    applyProfile, 
+    loadNextInvoiceNumber, 
+    saveInvoice,
+    sendInvoice,
+    downloadInvoice,
+} = useInvoice()
 
-const { invoice, addItem, removeItem, resetInvoice, applyProfile, loadNextInvoiceNumber } = useInvoice()
 const { profile, loadProfile } = useProfile()
 const { isRegisteredUser } = useAuth()
 
@@ -22,56 +36,10 @@ onMounted(async () => {
   await loadNextInvoiceNumber()
 })
 
-const downloadInvoice = async () => {
-    const response = await fetch('/api/download', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(invoice.value)
-    })
-
-    const blob = await response.blob()
-
-    const url = URL.createObjectURL(blob)
-
-    const a = document.createElement('a')
-    a.href = url
-    a.download = `faktura-`+ invoice.value.invoiceDetails.number + `.pdf`
-    a.click()
-
-    URL.revokeObjectURL(url)
-}
-
-const sendInvoice = async () => {
-    await $fetch('/api/send', {
-        method: 'POST',
-        body: invoice.value
-    })
-}
-
-const subtotal = computed(() => {
-    return invoice.value.items.reduce((sum: number, item: any) => {
-        return sum + Number(item.price) * Number(item.quantity)
-    }, 0)
-})
-
-const tax = computed(() => {
-    return subtotal.value * 0.25
-})
-
-const total = computed(() => {
-    return subtotal.value + tax.value
-})
-
-const getItemTotal = (item: any) => {
-    return Number(item.price) * Number(item.quantity)
-}
-
 const buttons = computed(() => [
     { label: 'Ny faktura', styling: 'secondary', action: resetInvoice, show: true},
-    { label: 'Gem', styling: 'secondary', action: () => {console.log('teeest')}, show: isRegisteredUser.value },
-    { label: 'Send', styling: 'secondary', action: sendInvoice, show: isRegisteredUser.value},
+    { label: 'Gem', styling: 'secondary', action: saveInvoice, show: isRegisteredUser.value },
+    { label: 'Send', styling: 'secondary', action: sendInvoice, show: isRegisteredUser.value },
     { label: 'Download', action: downloadInvoice, show: true },
 ].filter(item => item.show ?? true));
 
@@ -96,9 +64,10 @@ const buttons = computed(() => [
         <article class="invoice-fields--customer">
             <h2>Kunde oplysninger:</h2>
             <span>
-                <UiInput label="Faktura nr.:" placeholder="Fx. 100" v-model="invoice.invoiceDetails.number" rounded/>
+                <UiInput label="Faktura nr:" placeholder="Fx. 100" v-model="invoice.invoiceDetails.number" rounded/>
                 <UiInput label="Kundens navn:" placeholder="Fx. John Doe" v-model="invoice.customer.name" rounded/>
                 <UiInput label="Kundens adresse:" placeholder="Fx. Vesterbro 1, 9000 Aalborg" v-model="invoice.customer.address" rounded/>
+                <UiInput label="Vedr:" placeholder="Fx. Renovering" v-model="invoice.invoiceDetails.heading" rounded/>
             </span>
         </article>
 

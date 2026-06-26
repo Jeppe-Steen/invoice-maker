@@ -5,6 +5,10 @@
 
     const {
         invoice: stateInvoice,
+        subtotal,
+        tax,
+        total,
+        getItemTotal,
     } = useInvoice()
 
     const invoice = computed(() => {
@@ -18,24 +22,6 @@
     definePageMeta({
         layout: 'invoice'
     })
-
-    const subtotal = computed(() => {
-        return invoice.value.items.reduce((sum: number, item: any) => {
-            return sum + Number(item.price) * Number(item.quantity)
-        }, 0)
-    })
-
-    const tax = computed(() => {
-        return subtotal.value * 0.25
-    })
-
-    const total = computed(() => {
-        return subtotal.value + tax.value
-    })
-
-    const getItemTotal = (item: any) => {
-        return Number(item.price) * Number(item.quantity)
-    }
 </script>
 
 <template>
@@ -59,7 +45,7 @@
 
         <article>
             <header>
-                <h2>{{ invoice.invoiceDetails.heading }}</h2>
+                <h2>Vedr. {{ invoice.invoiceDetails.heading }}</h2>
             </header>
             <table>
                 <thead>
