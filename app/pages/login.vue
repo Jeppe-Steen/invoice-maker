@@ -29,6 +29,7 @@
             />
             <UiInput
                 placeholder="Password"
+                type="password"
                 v-model="loginCodentials.password"
                 rounded
             />

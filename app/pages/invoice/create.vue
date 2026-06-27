@@ -21,6 +21,7 @@ const {
 
 const { profile, loadProfile } = useProfile()
 const { isRegisteredUser } = useAuth()
+const { openDialog, values } = useDialog();
 
 definePageMeta({
     middleware: ['auth']
@@ -37,11 +38,54 @@ onMounted(async () => {
 })
 
 const buttons = computed(() => [
-    { label: 'Ny faktura', styling: 'secondary', action: resetInvoice, show: true},
+    { label: 'Ny faktura', styling: 'secondary', action: handleResetInvoice, show: true},
     { label: 'Gem', styling: 'secondary', action: saveInvoice, show: isRegisteredUser.value },
-    { label: 'Send', styling: 'secondary', action: sendInvoice, show: isRegisteredUser.value },
+    { label: 'Send', styling: 'secondary', action: handleSendInvoice, show: isRegisteredUser.value },
     { label: 'Download', action: downloadInvoice, show: true },
 ].filter(item => item.show ?? true));
+
+const handleResetInvoice = async () => {
+    const result = await openDialog({
+        title: 'Opret ny faktura',
+        message: 'Du er nu igang med at oprette ny fakura. vil du gemme det du allerede har lavet?',
+        actions: [
+            { label: 'Ja', value: 'accept', styling: 'cta' },
+            { label: 'Nej', value: 'decline', styling: 'danger' },
+        ]
+    })
+
+    switch(result) {
+        case 'accept':
+            saveInvoice()
+            return;
+        case 'decline':
+            resetInvoice();
+            return;
+    }
+}
+
+const handleSendInvoice = async () => {
+    const result:any = await openDialog({
+        title: 'Send faktura',
+        message: 'Det eneste vi nu er en email - indtast den nedenfor for at kommer videre!',
+        fields: [
+            { type: 'input', key: 'customerEmail', props: { type: 'email', placeholder: 'Fx. john@doe.com' } }
+        ],
+        actions: [
+            { label: 'Send', value: 'accept', styling: 'cta' },
+            { label: 'Annuler', value: 'decline', styling: 'danger' },
+        ]
+    })
+
+    switch(result.action) {
+        case 'accept':
+            console.log('Sending: ', result.values);
+            return;
+        case 'decline':
+            console.log('Closing dialog');
+            return;
+    }
+}
 
 </script>
 
@@ -64,7 +108,7 @@ const buttons = computed(() => [
         <article class="invoice-fields--customer">
             <h2>Kunde oplysninger:</h2>
             <span>
-                <UiInput label="Faktura nr:" placeholder="Fx. 100" v-model="invoice.invoiceDetails.number" rounded/>
+                <UiInput label="Faktura nr:" type="number" placeholder="Fx. 100" v-model="invoice.invoiceDetails.number" rounded/>
                 <UiInput label="Kundens navn:" placeholder="Fx. John Doe" v-model="invoice.customer.name" rounded/>
                 <UiInput label="Kundens adresse:" placeholder="Fx. Vesterbro 1, 9000 Aalborg" v-model="invoice.customer.address" rounded/>
                 <UiInput label="Vedr:" placeholder="Fx. Renovering" v-model="invoice.invoiceDetails.heading" rounded/>
@@ -104,8 +148,8 @@ const buttons = computed(() => [
                 <tbody>
                     <tr v-for="(item, itemIndex) in invoice.items">
                         <td colspan="1"><UiInput placeholder="Fx. arbejdstimer" v-model="invoice.items[itemIndex]!.name" rounded/></td>
-                        <td colspan="1"><UiInput placeholder="Fx. 10" v-model="invoice.items[itemIndex]!.quantity" rounded/></td>
-                        <td colspan="1"><UiInput placeholder="Fx. 100" v-model="invoice.items[itemIndex]!.price" rounded/></td>
+                        <td colspan="1"><UiInput placeholder="Fx. 10" type="number" v-model="invoice.items[itemIndex]!.quantity" rounded/></td>
+                        <td colspan="1"><UiInput placeholder="Fx. 100" type="number" v-model="invoice.items[itemIndex]!.price" rounded/></td>
                         <td colspan="1">{{ getItemTotal(item) }} {{ invoice.invoiceDetails.currency }}</td>
                         <td colspan="1"> <UiButton label="X" @click="removeItem(itemIndex)" styling="danger" size="small"/></td>
                     </tr>
