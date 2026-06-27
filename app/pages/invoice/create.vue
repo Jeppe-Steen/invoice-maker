@@ -21,7 +21,7 @@ const {
 
 const { profile, loadProfile } = useProfile()
 const { isRegisteredUser } = useAuth()
-const { openDialog, values } = useDialog();
+const { openDialog } = useDialog();
 
 definePageMeta({
     middleware: ['auth']
