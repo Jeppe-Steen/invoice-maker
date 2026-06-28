@@ -155,62 +155,21 @@ export const useInvoice = () => {
 
     await loadNextInvoiceNumber()
   }
-  
-  const saveInvoice = async () => {
-    const supabase = useSupabaseClient()
 
-    //setting subtotal, tax and total for invoive
-    invoice.value.invoiceDetails.price = subtotal.value
-    invoice.value.invoiceDetails.tax = tax.value
-    invoice.value.invoiceDetails.total = total.value
-
-    //getting user
-    const {
-      data: { user }
-    } = await supabase.auth.getUser()
-
-    // if not user throw error
-    if (!user || user.is_anonymous) {
-      throw new Error('Du skal være logget ind')
-    }
-
-    // inserting in database
-    const { data, error } = await supabase
-      .from('invoices')
-      .insert({
-        user_id: user.id,
-        invoice_number: invoice.value.invoiceDetails.number,
-        customer_name: invoice.value.customer.name,
-        invoice_date: invoice.value.invoiceDetails.created,
-        due_date: invoice.value.invoiceDetails.due,
-        subtotal: subtotal.value,
-        vat: tax.value,
-        total: total.value,
-        status: 'draft',
-        invoice: invoice.value
-      })
-      .select()
-      .single()
-
-    //if error, throw error
-    if (error) {
-      throw error
-    }
-
-    //The user needs to be able to make a new one or be sent to dashboard
-    await resetInvoice()
+  const sendInvoice = async (input: string) => {
+    await $fetch('/api/send', {
+        method: 'POST',
+        body: {
+          invoice: invoice.value,
+          mail: input
+        }
+    })
   }
 
-  const sendInvoice = async () => {
-    console.log('sending!')
-
-    // needs to open a modal with email input and a button which says 'if you send this will be marked as done and can't be edited again.
-
-
-    // await $fetch('/api/send', {
-    //     method: 'POST',
-    //     body: invoice.value
-    // })
+  const saveInvoice = async () => {
+    await $fetch('/api/save', {
+      method: 'POST',
+    })
   }
 
   const downloadInvoice = async () => {

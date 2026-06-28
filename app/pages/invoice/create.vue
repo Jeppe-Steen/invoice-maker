@@ -38,9 +38,8 @@ onMounted(async () => {
 })
 
 const buttons = computed(() => [
-    { label: 'Ny faktura', styling: 'secondary', action: handleResetInvoice, show: true},
-    { label: 'Gem', styling: 'secondary', action: saveInvoice, show: isRegisteredUser.value },
-    { label: 'Send', styling: 'secondary', action: handleSendInvoice, show: isRegisteredUser.value },
+    { label: 'Ny faktura', styling: 'secondary', action:isRegisteredUser.value ? handleResetInvoice : resetInvoice, show: true},
+    { label: 'Gem & send', styling: 'secondary', action: saveInvoice, show: isRegisteredUser.value },
     { label: 'Download', action: downloadInvoice, show: true },
 ].filter(item => item.show ?? true));
 
@@ -64,7 +63,7 @@ const handleResetInvoice = async () => {
     }
 }
 
-const handleSendInvoice = async () => {
+const handleSaveAndSendInvoice = async () => {
     const result:any = await openDialog({
         title: 'Send faktura',
         message: 'Det eneste vi nu er en email - indtast den nedenfor for at kommer videre!',
@@ -79,10 +78,11 @@ const handleSendInvoice = async () => {
 
     switch(result.action) {
         case 'accept':
-            console.log('Sending: ', result.values);
+            await saveInvoice()
+            // await sendInvoice(result.values.customerEmail)
+            // await resetInvoice()
             return;
         case 'decline':
-            console.log('Closing dialog');
             return;
     }
 }
