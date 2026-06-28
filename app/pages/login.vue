@@ -16,9 +16,9 @@
 <template>
     <section class="login-container">
         <header>
-            <h1>Velkommen til!</h1>
-            <p>Her har du mulighed for at oprette faktura'er.</p>
-            <p>Helt simpelt og enkelt</p>
+            <h1>Velkommen til InvoiceMaker</h1>
+            <p>Opret professionelle fakturaer på få minutter.</p>
+            <p>Log ind for at gemme, sende og holde styr på dine fakturaer.</p>
         </header>
 
         <article>
@@ -45,7 +45,7 @@
 
         <article>
             <UiButton
-                label="Fortsæt som gæst" 
+                label="Prøv uden konto" 
                 styling="secondary" 
                 size="big"
                 @click="loginAnonymously"
@@ -53,15 +53,15 @@
         </article>
 
         <span class="small-text">
-            <p><strong>*</strong> Som gæst er det ikke muligt at gemme/sende sin faktura, KUN downloade.</p>
-            <p><strong>*</strong> Da siden stadig er under udvikling, vi ldet ikke være muligt selv at oprette en konto, men det er altid muligt at kontakte: <strong>mail@mail.com</strong> - vedr. mulighed for oprettelse</p>
+            <p>* Som gæst kan du oprette og downloade fakturaer, men de bliver ikke gemt og kan ikke sendes via InvoiceMaker.</p>
+            <p>* InvoiceMaker er i øjeblikket under udvikling. Oprettelse af nye konti er derfor midlertidigt lukket. Hvis du ønsker en konto, er du velkommen til at kontakte os på mail@mail.com.</p>
         </span>
     </section>
 </template>
 
 <style lang="scss" scoped>
     .login-container {
-        width: 500px;
+        width: 550px;
         height: fit-content;
         border-radius: 20px;
 
