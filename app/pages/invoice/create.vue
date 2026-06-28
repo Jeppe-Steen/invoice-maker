@@ -37,12 +37,14 @@ onMounted(async () => {
   await loadNextInvoiceNumber()
 })
 
+//DONE!
 const buttons = computed(() => [
     { label: 'Ny faktura', styling: 'secondary', action:isRegisteredUser.value ? handleResetInvoice : resetInvoice, show: true},
-    { label: 'Gem & send', styling: 'secondary', action: saveInvoice, show: isRegisteredUser.value },
+    { label: 'Gem & send', styling: 'secondary', action: handleSaveAndSendInvoice, show: isRegisteredUser.value },
     { label: 'Download', action: downloadInvoice, show: true },
 ].filter(item => item.show ?? true));
 
+//DONE!
 const handleResetInvoice = async () => {
     const result = await openDialog({
         title: 'Opret ny faktura',
@@ -63,6 +65,7 @@ const handleResetInvoice = async () => {
     }
 }
 
+//DONE!
 const handleSaveAndSendInvoice = async () => {
     const result:any = await openDialog({
         title: 'Send faktura',
@@ -79,8 +82,8 @@ const handleSaveAndSendInvoice = async () => {
     switch(result.action) {
         case 'accept':
             await saveInvoice()
-            // await sendInvoice(result.values.customerEmail)
-            // await resetInvoice()
+            await sendInvoice(result.values.customerEmail)
+            await resetInvoice()
             return;
         case 'decline':
             return;
