@@ -167,9 +167,19 @@ export const useInvoice = () => {
   }
 
   const saveInvoice = async () => {
+    invoice.value.invoiceDetails.price = subtotal.value
+    invoice.value.invoiceDetails.tax = tax.value
+    invoice.value.invoiceDetails.total = total.value
+
     await $fetch('/api/save', {
-      method: 'POST',
-    })
+        method: 'POST',
+        body: {
+          invoice: invoice.value,
+          subtotal: subtotal.value,
+          tax: tax.value,
+          total: total.value
+        }
+      })
   }
 
   const downloadInvoice = async () => {
