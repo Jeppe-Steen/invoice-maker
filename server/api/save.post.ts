@@ -33,11 +33,20 @@ export default defineEventHandler(async (event) => {
         .single()
 
     if (error) {
+        if (error.code === '23505') {
+            throw createError({
+                statusCode: 409,
+                statusMessage: 'Fakturanummeret findes allerede.'
+            })
+        }
+        
         throw createError({
             statusCode: 500,
             statusMessage: error.message
         })
     }
+
+    
 
     return data
 })
