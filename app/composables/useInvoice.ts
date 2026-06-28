@@ -183,6 +183,10 @@ export const useInvoice = () => {
   }
 
   const downloadInvoice = async () => {
+    invoice.value.invoiceDetails.price = subtotal.value
+    invoice.value.invoiceDetails.tax = tax.value
+    invoice.value.invoiceDetails.total = total.value
+    
     const response = await fetch('/api/download', {
         method: 'POST',
         headers: {

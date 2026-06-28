@@ -5,9 +5,6 @@
 
     const {
         invoice: stateInvoice,
-        subtotal,
-        tax,
-        total,
         getItemTotal,
     } = useInvoice()
 
@@ -69,15 +66,15 @@
                 <tfoot>
                     <tr>
                         <th colspan="3">Pris eksl. moms</th>
-                        <td>{{ subtotal }} {{ invoice.invoiceDetails.currency }}</td>
+                        <td>{{ invoice.invoiceDetails.price  }} {{ invoice.invoiceDetails.currency }}</td>
                     </tr>
                     <tr>
                         <th colspan="3">Moms</th>
-                        <td>{{ tax }} {{ invoice.invoiceDetails.currency }}</td>
+                        <td>{{ invoice.invoiceDetails.tax }} {{ invoice.invoiceDetails.currency }}</td>
                     </tr>
                     <tr>
                         <th colspan="3">Pris incl. moms</th>
-                        <th>{{ total }} {{ invoice.invoiceDetails.currency }}</th>
+                        <th>{{ invoice.invoiceDetails.total }} {{ invoice.invoiceDetails.currency }}</th>
                     </tr>
                 </tfoot>
             </table>
