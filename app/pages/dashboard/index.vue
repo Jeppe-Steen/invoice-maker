@@ -1,5 +1,4 @@
 <script setup>
-import UiCard from '~/components/newUiComponents/UiCard.vue';
 import { useDashboard } from '~/composables/useDashboard';
 
 const { loadDashboard, dashboard} = useDashboard()
@@ -9,11 +8,24 @@ definePageMeta({
     layout: 'dashboard'
 })
 
+const createInvoice = async () => {
+    await navigateTo('/invoice/create')
+}
+
+const testFunction = () => {
+    console.log('this is just a test');
+}
+
 const cards = [
-    { title: 'Omæstning (denne måned)', value: dashboard?.value.stats.revenue, subTitle: '+ 0% fra sidste måned' },
-    { title: 'Fakturaer (denne måned)', value: dashboard?.value.stats.invoiceCount, subTitle: 'Total fakturaer' },
+    { title: 'Omæstning (denne måned)', value: dashboard?.value.stats.revenue || 'Loading...', subTitle: '+ 0% fra sidste måned' },
+    { title: 'Fakturaer (denne måned)', value: dashboard.value.stats.invoiceCount || 'Loading...', subTitle: 'Total fakturaer' },
 ];
 
+const quickActions = [
+    { title: 'Opret faktura', subTitle: 'Kom hurtigt igang med en ny faktura', action: createInvoice },
+    { title: 'Virksomhedsoplysninger', subTitle: 'Rediger dine virksomhedsoplysninger', action: testFunction },
+    { title: 'Download seneste faktura', subTitle: 'Download PDF af seneste faktura', action: testFunction },
+]
 
 onMounted(async () => {
     await loadDashboard();
@@ -37,7 +49,7 @@ onMounted(async () => {
     <section class="dashboard--overview">
         <UiCard v-for="card in cards" :title="card.title" :value="card.value" :subTitle="card.subTitle">
             <template #icon>
-                ICON HERE
+                ICON
             </template>
         </UiCard>
     </section>
@@ -76,6 +88,12 @@ onMounted(async () => {
             <header>
                 <h3>Hurtige handlinger</h3>
             </header>
+            
+            <UiCard v-for="card in quickActions" :title="card.title" :subTitle="card.subTitle" clickable @click="card.action?.()">
+                <template #icon>
+                    ICON
+                </template>
+            </UiCard>
         </article>
     </section>
 </template>
@@ -102,16 +120,16 @@ onMounted(async () => {
             display: grid;
             grid-template-columns: 1fr 1fr 1fr;
             width: 100%;
-            height: 150px;
+            height: fit-content;
             gap: 2rem;
         }
 
         &--invoice-actions {
             display: grid;
-            grid-template-columns: 1fr .5fr;
+            grid-template-columns: 1fr .6fr;
             gap: 2rem;
             width: 100%;
-            height: 50vh;
+            height: fit-content;
 
             .invoices { 
                 padding: 20px;
