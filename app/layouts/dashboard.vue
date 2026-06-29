@@ -2,15 +2,13 @@
   import { useAuth } from '~/composables/useAuth'
   const { isLoggedIn, isRegisteredUser, logout } = useAuth();
 
-
   const navLinks = computed(() => [
-      {label: 'Forside', to: '/', styling: 'link', show: !isLoggedIn ? true : false },
       {label: 'Overblik', to: '/dashboard', styling: 'link', show: isLoggedIn.value && isRegisteredUser.value },
       {label: 'Opret faktura', to: '/invoice/create', styling: 'link', show: true },
-      {label: 'Log ind', to: '/login', show: !isLoggedIn.value, size: 'medium' },
       {label: 'Log ud', show: isLoggedIn.value, action: logout, size: 'medium' },
   ].filter(item => item.show ?? true));
 </script>
+
 <template>
     <UiNavigation>
         <template #logo>
@@ -47,7 +45,7 @@
         padding: 2rem;
 
         display: grid;
-        grid-template-columns: 1fr minmax(0, 70%) 1fr;
+        grid-template-columns: 1fr minmax(0, 80%) 1fr;
         gap: 1rem;
         grid-template-areas: '. content .';
 
@@ -55,7 +53,7 @@
             grid-area: content;
             display: flex;
             flex-direction: column;
-            gap: 1rem;
+            gap: 2rem;
         }
 
     }
