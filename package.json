@@ -10,7 +10,7 @@
     "postinstall": "nuxt prepare"
   },
   "dependencies": {
-    "@jrs/ui": "git+https://github.com/Jeppe-Steen/jrs-ui.git",
+    "@jrs/ui": "github:Jeppe-Steen/jrs-ui",
     "nuxt": "^4.4.8",
     "puppeteer": "^25.2.0",
     "resend": "^6.14.0",
