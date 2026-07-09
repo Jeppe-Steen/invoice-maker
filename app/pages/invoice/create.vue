@@ -82,7 +82,7 @@ const handleSaveAndSendInvoice = async () => {
     switch(result.action) {
         case 'accept':
             await saveInvoice()
-            await sendInvoice(result.values.customerEmail)
+            // await sendInvoice(result.values.customerEmail)
             await resetInvoice()
             return;
         case 'decline':
