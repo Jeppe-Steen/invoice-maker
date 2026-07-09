@@ -17,14 +17,14 @@ const testFunction = () => {
 }
 
 const cards = [
-    { title: 'Omæstning (denne måned)', value: dashboard?.value.stats.revenue || 'Loading...', subTitle: '+ 0% fra sidste måned' },
-    { title: 'Fakturaer (denne måned)', value: dashboard.value.stats.invoiceCount || 'Loading...', subTitle: 'Total fakturaer' },
+    { title: 'Omæstning (denne måned)', value: dashboard?.value.stats.revenue || 'Loading...', subTitle: '+ 0% fra sidste måned', icon: { name: 'document', size: 30, color: '#5C32E6', background: '#5C32E630' } },
+    { title: 'Fakturaer (denne måned)', value: dashboard.value.stats.invoiceCount || 'Loading...', subTitle: 'Total fakturaer', icon: { name: 'check', size: 30, color: '#29781F', background: '#29781F30' } },
 ];
 
 const quickActions = [
-    { title: 'Opret faktura', subTitle: 'Kom hurtigt igang med en ny faktura', action: createInvoice },
-    { title: 'Virksomhedsoplysninger', subTitle: 'Rediger dine virksomhedsoplysninger', action: testFunction },
-    { title: 'Download seneste faktura', subTitle: 'Download PDF af seneste faktura', action: testFunction },
+    { title: 'Opret faktura', subTitle: 'Kom hurtigt igang med en ny faktura', action: createInvoice, icon: { name: 'pen', size: 30, color: '#5C32E6', background: '#5C32E630' } },
+    { title: 'Virksomhedsoplysninger', subTitle: 'Rediger dine virksomhedsoplysninger', action: testFunction, icon: { name: 'shop', size: 30, color: '#29781F', background: '#29781F30' } },
+    { title: 'Download seneste faktura', subTitle: 'Download PDF af seneste faktura', action: testFunction, icon: { name: 'download', size: 30, color: '#F5D95B', background: '#F5D95B30' } },
 ]
 
 onMounted(async () => {
@@ -49,7 +49,7 @@ onMounted(async () => {
     <section class="dashboard--overview">
         <UiCard v-for="card in cards" :title="card.title" :value="card.value" :subTitle="card.subTitle">
             <template #icon>
-                ICON
+                <UiIcon :name="card.icon.name" :size="card.icon.size" :color="card.icon.color" :background="card.icon.background" rounded/>
             </template>
         </UiCard>
     </section>
@@ -91,7 +91,7 @@ onMounted(async () => {
             
             <UiCard v-for="card in quickActions" :title="card.title" :subTitle="card.subTitle" clickable @click="card.action?.()">
                 <template #icon>
-                    ICON
+                    <UiIcon :name="card.icon.name" :size="card.icon.size" :color="card.icon.color" :background="card.icon.background" rounded />
                 </template>
             </UiCard>
         </article>
