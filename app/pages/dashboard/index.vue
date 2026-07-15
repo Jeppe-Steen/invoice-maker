@@ -1,7 +1,9 @@
 <script setup>
 import { useDashboard } from '~/composables/useDashboard';
+import { useInvoice } from '~/composables/useInvoice';
 
 const { loadDashboard, dashboard} = useDashboard()
+const { invoice, downloadInvoice, resetInvoice} = useInvoice()
 
 definePageMeta({
     middleware: ['registered-user'],
@@ -31,6 +33,11 @@ onMounted(async () => {
     await loadDashboard();
 })
 
+const download = async (item) => {
+    invoice.value = item.invoice;
+    await downloadInvoice();
+    await resetInvoice();
+}
 
 </script>
 
@@ -69,6 +76,7 @@ onMounted(async () => {
                         <th>Dato</th>
                         <th>Beløb</th>
                         <th>Status</th>
+                        <th>Action</th>
                     </tr>
                 </thead>
 
@@ -79,6 +87,7 @@ onMounted(async () => {
                         <td>{{ invoice.invoice_date }}</td>
                         <td>{{ invoice.total }} DKK</td>
                         <td>{{ invoice.status }}</td>
+                        <td><UiButton label="Download" @click="download(invoice)"/></td>
                     </tr>
                 </tbody>
             </table>
@@ -126,7 +135,7 @@ onMounted(async () => {
 
         &--invoice-actions {
             display: grid;
-            grid-template-columns: 1fr .6fr;
+            grid-template-columns: 1fr .4fr;
             gap: 2rem;
             width: 100%;
             height: fit-content;

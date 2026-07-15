@@ -24,7 +24,8 @@ export default defineEventHandler(async (event) => {
             customer_name,
             invoice_date,
             total,
-            status
+            status,
+            invoice
         `)
         .order('created_at', { ascending: false })
         .limit(5)
