@@ -3,8 +3,8 @@
   const { isLoggedIn, isRegisteredUser, logout } = useAuth();
 
   const navLinks = computed(() => [
-      {label: 'Overblik', to: '/dashboard', styling: 'link', show: isLoggedIn.value && isRegisteredUser.value },
-      {label: 'Opret faktura', to: '/invoice/create', styling: 'link', show: true },
+      {label: 'Overblik', to: '/dashboard', type: 'link', show: isLoggedIn.value && isRegisteredUser.value },
+      {label: 'Opret faktura', to: '/invoice/create', type: 'link', show: true },
       {label: 'Log ud', show: isLoggedIn.value, action: logout, size: 'medium' },
   ].filter(item => item.show ?? true));
 </script>
@@ -21,7 +21,7 @@
             :key="item.label"
             :label="item.label"
             :to="item.to"
-            :styling="item.styling"
+            :type="item.type"
             :size="item.size"
             @click="item.action?.()"
         />
@@ -41,7 +41,7 @@
     .content-container {
         width: 100%;
         min-height: 100vh;
-        background-color: var(--background-color);
+        background-color: var(--ui-background-primary);
         padding: 2rem;
 
         display: grid;

@@ -10,7 +10,7 @@
     .content-container {
         width: 100%;
         min-height: 100vh;
-        background-color: var(--background-color);
+        background-color: var(--ui-background-primary);
 
         display: grid;
         grid-template-columns: 100%;
