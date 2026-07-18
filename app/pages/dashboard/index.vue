@@ -19,14 +19,14 @@ const testFunction = () => {
 }
 
 const cards = [
-    { title: 'Omæstning (denne måned)', value: dashboard?.value.stats.revenue || 'Loading...', subTitle: '+ 0% fra sidste måned', icon: { name: 'document', size: 30, color: '#5C32E6', background: '#5C32E630' } },
-    { title: 'Fakturaer (denne måned)', value: dashboard.value.stats.invoiceCount || 'Loading...', subTitle: 'Total fakturaer', icon: { name: 'check', size: 30, color: '#29781F', background: '#29781F30' } },
+    { title: 'Omæstning (denne måned)', value: dashboard?.value.stats.revenue + ' kr' || 'Loading...', icon: { name: 'document', size: 30, backgroundSize: 45, color: '#5C32E6', background: '#5C32E630' } },
+    { title: 'Fakturaer (denne måned)', value: dashboard?.value.stats.invoiceCount + ' stk' || 'Loading...', icon: { name: 'check', size: 30, backgroundSize: 45, color: '#29781F', background: '#29781F30' } },
 ];
 
 const quickActions = [
-    { title: 'Opret faktura', subTitle: 'Kom hurtigt igang med en ny faktura', action: createInvoice, icon: { name: 'pen', size: 30, color: '#5C32E6', background: '#5C32E630' } },
-    { title: 'Virksomhedsoplysninger', subTitle: 'Rediger dine virksomhedsoplysninger', action: testFunction, icon: { name: 'shop', size: 30, color: '#29781F', background: '#29781F30' } },
-    { title: 'Download seneste faktura', subTitle: 'Download PDF af seneste faktura', action: testFunction, icon: { name: 'download', size: 30, color: '#F5D95B', background: '#F5D95B30' } },
+    { title: 'Opret faktura', subTitle: 'Kom hurtigt igang med en ny faktura', action: createInvoice, icon: { name: 'pen', size: 30, backgroundSize: 45, color: '#5C32E6', background: '#5C32E630' } },
+    { title: 'Virksomhedsoplysninger', subTitle: 'Rediger dine virksomhedsoplysninger', action: testFunction, icon: { name: 'shop', size: 30, backgroundSize: 45, color: '#29781F', background: '#29781F30' } },
+    { title: 'Download seneste faktura', subTitle: 'Download PDF af seneste faktura', action: testFunction, icon: { name: 'download', size: 30, backgroundSize: 45, color: '#F5D95B', background: '#F5D95B30' } },
 ]
 
 onMounted(async () => {
@@ -42,142 +42,178 @@ const download = async (item) => {
 </script>
 
 <template>
-    <header class="dashboard--header">
+    <div class="header">
+        <UiHeader>
+            <template #subtitle>
+                <h1>God eftermiddag, Jeppe!</h1>
+            </template>
+            <template #title>
+                <p>Her er et overblik over din forretning og dine fakturaer</p>
+            </template>
+        </UiHeader>
+
         <span>
-            <h1>God eftermiddag, Jeppe!</h1>
-            <p>Her er et overblik over din forretning og dine fakturaer</p>
-        </span>
-        <span>
-            <UiButton label="+ Opret ny faktura" size="big" />
+            <UiButton label="Opret ny faktura" to="/invoice/create"/>
             <p>Hurtigt, nemt og professionelt</p>
         </span>
-    </header>
+    </div>
 
-    <section class="dashboard--overview">
-        <UiCard v-for="card in cards" :title="card.title" :value="card.value" :subTitle="card.subTitle">
-            <template #icon>
-                <UiIcon :name="card.icon.name" :size="card.icon.size" :color="card.icon.color" :background="card.icon.background" rounded/>
-            </template>
+    <section class="overview">
+        <UiCard v-for="card in cards" shadow rounded>
+            <span class="overview--card">
+                <UiIcon :name="card.icon.name" :size="card.icon.size" :backgroundSize="card.icon.backgroundSize" :color="card.icon.color" :background="card.icon.background" rounded/>
+                <UiHeader>
+                    <template #subtitle>
+                        <strong>{{ card.title }}</strong>
+                    </template>
+                    <template #title>
+                        <p>{{ card.value }}</p>
+                    </template>
+                </UiHeader>
+            </span>
         </UiCard>
     </section>
 
-    <section class="dashboard--invoice-actions">
-        <article class="invoices">
-            <header>
-                <h3>Seneste fakturaer</h3>
-                <UiButton label="Se alle fakturaer" styling="link" />
-            </header>
+    <section class="invoice-actions">
+        <UiCard rounded shadow>
+            <span class="invoices">
+                <div class="invoices--header">
+                    <UiHeader>
+                        <template #title>
+                            <h3>Seneste fakturaer</h3>
+                        </template>
+                    </UiHeader>
+                    
+                    <UiButton label="Se alle fakturaer" />
+                </div>
 
-            <table>
-                <thead>
-                    <tr>
-                        <th>Nr.</th>
-                        <th>Kunde</th>
-                        <th>Dato</th>
-                        <th>Beløb</th>
-                        <th>Status</th>
-                        <th>Action</th>
-                    </tr>
-                </thead>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Nr.</th>
+                            <th>Kunde</th>
+                            <th>Dato</th>
+                            <th>Beløb</th>
+                            <th>Status</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
 
-                <tbody>
-                    <tr v-for="invoice in dashboard.latestInvoices">
-                        <th># {{ invoice.invoice_number }}</th>
-                        <td>{{ invoice.customer_name }}</td>
-                        <td>{{ invoice.invoice_date }}</td>
-                        <td>{{ invoice.total }} DKK</td>
-                        <td>{{ invoice.status }}</td>
-                        <td><UiButton label="Download" @click="download(invoice)"/></td>
-                    </tr>
-                </tbody>
-            </table>
-        </article>
+                    <tbody>
+                        <tr v-for="invoice in dashboard.latestInvoices">
+                            <th># {{ invoice.invoice_number }}</th>
+                            <td>{{ invoice.customer_name }}</td>
+                            <td>{{ invoice.invoice_date }}</td>
+                            <td>{{ invoice.total }} DKK</td>
+                            <td>{{ invoice.status }}</td>
+                            <td><UiButton label="Download" @click="download(invoice)"/></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </span>
+        </UiCard>
 
-        <article class="actions">
-            <header>
-                <h3>Hurtige handlinger</h3>
-            </header>
-            
-            <UiCard v-for="card in quickActions" :title="card.title" :subTitle="card.subTitle" clickable @click="card.action?.()">
-                <template #icon>
-                    <UiIcon :name="card.icon.name" :size="card.icon.size" :color="card.icon.color" :background="card.icon.background" rounded />
+        <UiCard shadow rounded>
+            <UiHeader>
+                <template #title>
+                    <h3>Hurtige handlinger</h3>
                 </template>
+            </UiHeader>
+            
+            <UiCard v-for="card in quickActions" shadow rounded @click="card.action?.()" class="clickable">
+                <span class="actions--card">
+                    <UiIcon :name="card.icon.name" :size="card.icon.size" :backgroundSize="card.icon.backgroundSize" :color="card.icon.color" :background="card.icon.background" rounded/>
+                    <UiHeader>
+                        <template #subtitle>
+                            <strong>{{ card.title }}</strong>
+                        </template>
+                        <template #title>
+                            <p>{{ card.subTitle }}</p>
+                        </template>
+                    </UiHeader>
+                </span>
             </UiCard>
-        </article>
+        </UiCard>
     </section>
 </template>
 
 <style lang="scss" scoped>
-    .dashboard {
-        &--header {
-            width: 100%;
-            height: 100px;
+    .header {
+        width: 100%;
+        height: 100px;
 
+        display: grid;
+        grid-template-columns: 1fr .2fr;
+        align-items: center;
+
+        span {
             display: flex;
-            flex-direction: row;
-            align-items: center;
-            justify-content: space-between;
-
-            span {
-                display: flex;
-                flex-direction: column;
-                gap: .5rem;
-            }
+            flex-direction: column;
+            gap: .5rem;
         }
+    }
 
-        &--overview {
-            display: grid;
-            grid-template-columns: 1fr 1fr 1fr;
+    .overview {
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+        width: 100%;
+        height: fit-content;
+        gap: 2rem;
+
+        &--card {
             width: 100%;
-            height: fit-content;
-            gap: 2rem;
+            height: 100%;
+            display: grid;
+            grid-template-columns: .3fr 1fr;
+            gap: 1rem;
         }
+    }
 
-        &--invoice-actions {
-            display: grid;
-            grid-template-columns: 1fr .4fr;
-            gap: 2rem;
-            width: 100%;
-            height: fit-content;
+    .invoice-actions {
+        display: grid;
+        grid-template-columns: 1fr .5fr;
+        gap: 2rem;
+        width: 100%;
+        height: fit-content;
 
-            .invoices { 
-                padding: 20px;
-                background-color: white;
-                box-shadow: 2px 2px 10px #00000025;
-                border-radius: 10px;
-                display: flex;
-                flex-direction: column;
+        .invoices { 
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+
+            &--header {
+                display: grid;
                 gap: 1rem;
+                grid-template-columns: 1fr .3fr;
+                align-items: center;
+            }
 
-                header {
-                    display: flex;
-                    flex-direction: row;
-                    justify-content: space-between;
-                    align-items: center;
+            table {
+                td, th {
+                    padding: 10px;
+                }
+                thead {
+                    text-align: left;
                 }
 
-                table {
-                    td, th {
-                        padding: 10px;
-                    }
-                    thead {
-                        text-align: left;
-                    }
-
-                    tbody {
-                        text-align: left;
-                    }
+                tbody {
+                    text-align: left;
                 }
             }
-            .actions {
-                padding: 20px;
-                background-color: white;
-                box-shadow: 2px 2px 10px #00000025;
-                border-radius: 10px;
+        }
+
+        .actions {
+            &--card {
+                width: 100%;
+                height: 100%;
+                display: grid;
+                grid-template-columns: .3fr 1fr;
                 gap: 1rem;
-                display: flex;
-                flex-direction: column;
             }
         }
+    }
+
+    .clickable {
+        cursor: pointer;
     }
 </style>

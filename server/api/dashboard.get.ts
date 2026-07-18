@@ -40,7 +40,7 @@ export default defineEventHandler(async (event) => {
 
     const revenue =
         allInvoices
-            ?.filter(i => i.status === 'saved')
+            ?.filter(i => i.status === 'send')
             .reduce((sum, i) => sum + Number(i.total), 0) ?? 0
 
     // const pending =
