@@ -1,63 +1,94 @@
 <script setup>
     import { useAuth } from '~/composables/useAuth'
     const { loginAnonymously } = useAuth();
+
     definePageMeta({
         layout: 'full',
     })
 
+    //hero section
+    const heroBtns = [
+        { label: 'Prøv gratis', type: 'secondary', action: loginAnonymously },
+        { label: 'Log ind', to: '/login' },
+    ]
+
     const testArray = [
-        { heading: 'Prøv uden oprettelse', text: 'Opret din første faktura med det samme – helt uden at oprette en konto.' },
-        { heading: 'Hurtig fakturering', text: 'Opret professionelle fakturaer på få minutter med automatisk beregning af moms og total.' },
-        { heading: 'Økonomisk overblik', text: 'Gem dine fakturaer sikkert og få et samlet overblik over fakturanumre og omsætning.' },
-        { heading: "Professionelle PDF'er", text: 'Download fakturaer som flotte PDF-filer, klar til at sende eller printe.' },
-        { heading: "Send direkte", text: 'Send fakturaen direkte til kunden via e-mail med få klik.' },
-        { heading: "Automatisk nummerering", text: 'Fakturanumre håndteres automatisk, så du slipper for manuelt arbejde.' },
+        { heading: 'Prøv uden oprettelse', text: 'Opret din første faktura med det samme – helt uden at oprette en konto.', icon: { name: 'pen', size: 40, backgroundSize: 55, color: '#6594B1', background: '#6594B130'} },
+        { heading: 'Hurtig fakturering', text: 'Opret professionelle fakturaer på få minutter med automatisk beregning af moms og total.', icon: { name: 'clock', size: 40, backgroundSize: 55, color: '#6594B1', background: '#6594B130'} },
+        { heading: 'Økonomisk overblik', text: 'Gem dine fakturaer sikkert og få et samlet overblik over fakturanumre og omsætning.', icon: { name: 'shop', size: 40, backgroundSize: 55, color: '#6594B1', background: '#6594B130'} },
+        { heading: "Professionelle PDF'er", text: 'Download fakturaer som flotte PDF-filer, klar til at sende eller printe.', icon: { name: 'document', size: 40, backgroundSize: 55, color: '#6594B1', background: '#6594B130'} },
+        { heading: "Send direkte", text: 'Send fakturaen direkte til kunden via e-mail med få klik.', icon: { name: 'check', size: 40, backgroundSize: 55, color: '#6594B1', background: '#6594B130'} },
+        { heading: "Automatisk nummerering", text: 'Fakturanumre håndteres automatisk, så du slipper for manuelt arbejde.', icon: { name: 'plus', size: 40, backgroundSize: 55, color: '#6594B1', background: '#6594B130'} },
     ];
 </script>
 
 <template>
     <section class="hero">
-        <header>
-            <h1>Opret professionelle fakturaer på få minutter</h1>
-            <span>
-                <p>Slip for Word-skabeloner og manuelle beregninger.</p>
-                <p>InvoiceMaker hjælper dig med at oprette flotte fakturaer på få minutter.</p>
-            </span>
-        </header>
-        <span>
-            <UiButton
-                label="Prøv gratis"
-                styling="secondary"
-                @click="loginAnonymously"
-            />
-            <UiButton
-                label="Log ind"
-                to="/login"
+        <UiHeader centered>
+            <template #title>
+                <h1>Opret professionelle fakturaer på få minutter</h1>
+            </template>
+        </UiHeader>
+
+        <span class="hero--description">
+            <p>Slip for Word-skabeloner og manuelle beregninger.</p>
+            <p>InvoiceMaker hjælper dig med at oprette flotte fakturaer på få minutter.</p>
+        </span>
+
+        <span class="hero--btns">
+            <UiButton v-for="(btns, index) in heroBtns" :key="index"
+                :label="btns?.label"
+                :type="btns?.type"
+                :to="btns?.to"
+                :size="btns?.size"
+                @click="btns.action?.()"
             />
         </span>
     </section>
 
     <section class="features">
-        <header>
-            <h2>Alt du skal bruge til fakturering</h2>
-        </header>
-        <span>
-            <article v-for="(item, index) in testArray" :key="index">
-                <h3>{{ item.heading }}</h3>
-                <p>{{ item.text }}</p>
-            </article>
-        </span>
+        <UiHeader centered>
+            <template #title>
+                <h2>Alt du skal bruge til fakturering</h2>
+            </template>
+        </UiHeader>
+
+        <article class="features--content">
+            <UiCard v-for="(item, index) in testArray" :key="index" rounded shadow>
+                <UiHeader>
+                    <template #title>
+                        <h3>{{ item.heading }}</h3>
+                    </template>
+                </UiHeader>
+
+                <span class="feature--content">
+                    <p>{{ item.text }}</p>
+                    <UiIcon
+                        :name="item.icon?.name"
+                        :color="item.icon?.color"
+                        :background="item.icon?.background" 
+                        :size="item.icon?.size"
+                        :backgroundSize="item.icon?.backgroundSize"
+                        rounded
+                    />
+                </span>
+            </UiCard>
+        </article>
     </section>
 
     <section class="ready">
-        <header>
-            <h2>Klar til at oprette din første faktura?</h2>
-            <p>Det tager mindre end to minutter at komme i gang.</p>
-        </header>
+        <UiHeader centered>
+            <template #title>
+                <h2>Klar til at oprette din første faktura?</h2>
+            </template>
+        </UiHeader>
+
+        <p>Det tager mindre end to minutter at komme i gang.</p>
+        
         <span>
             <UiButton
                 label="Opret din første faktura"
-                size="big"
+                size="large"
                 :to="'/login'"
             />
        </span>
@@ -74,22 +105,14 @@
         justify-content: center;
         gap: 1rem;
 
-        header {
-            text-align: center;
-            width: 60%;
-
+        &--description {
             display: flex;
             flex-direction: column;
+            text-align: center;
             gap: .5rem;
-
-            span {
-                display: flex;
-                flex-direction: column;
-                gap: 0;
-            }
         }
 
-        span {
+        &--btns {
             display: flex;
             flex-direction: row;
             gap: 1rem;
@@ -104,33 +127,22 @@
         gap: 2rem;
 
         width: 100%;
-        height: 80vh;
+        height: 70vh;
 
-        background-color: var(--background-reversed);
+        background-color: var(--primary-color);
 
-        header {
-            color: var(--text-color-2);
-        }
-
-        span {
+        &--content {
             display: grid;
             grid-template-columns: 1fr 1fr 1fr;
             gap: 2rem;
             width: 80%;
 
-            article {
-                width: 100%;
-                height: fit-content;
-                padding: 25px;
-                text-align: left;
-                border-radius: 20px;
-
-                display: flex;
-                flex-direction: column;
-                gap: .5rem;
-
-                color: var(--text-color-2);
-                background-color: #3b3b3b51;
+            .feature {
+                &--content {
+                    display: grid;
+                    grid-template-columns: 1fr .2fr;
+                    gap: 1rem;
+                }
             }
         }
     }
@@ -144,14 +156,5 @@
         align-items: center;
         justify-content: center;
         gap: 1rem;
-
-        header {
-            text-align: center;
-            width: 60%;
-
-            display: flex;
-            flex-direction: column;
-            gap: .5rem;
-        }
     }
 </style>

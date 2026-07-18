@@ -8,4 +8,7 @@ export default defineNuxtConfig({
     key: 'sb_publishable_0cYXN_A5vgCpwIO5atkShw_DlbnDty7',
     redirect: false,
   },
+  css: [
+    '~/assets/theme.css'
+  ],
 })
