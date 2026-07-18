@@ -15,47 +15,38 @@
 
 <template>
     <section class="login-container">
-        <header>
-            <h1>Velkommen til InvoiceMaker</h1>
+        <UiHeader centered>
+            <template #title>
+                <h1>Velkommen til InvoiceMaker</h1>
+            </template>
+        </UiHeader>
+
+        <span class="login-container--text">
             <p>Opret professionelle fakturaer på få minutter.</p>
             <p>Log ind for at gemme, sende og holde styr på dine fakturaer.</p>
-        </header>
+        </span>
 
-        <article>
-            <UiInput
-                placeholder="E-mail"
-                v-model="loginCodentials.mail"
-                rounded
-            />
-            <UiInput
-                placeholder="Password"
-                type="password"
-                v-model="loginCodentials.password"
-                rounded
-            />
+        <article class="login-container--content">
+            <UiForm @submit="loginWithEmail(loginCodentials.mail, loginCodentials.password)">
+                <UiInput name="email" placeholder="Email" type="email" required v-model="loginCodentials.mail" rounded />
+                <UiInput name="password" placeholder="Kodeord" type="password" required v-model="loginCodentials.password" rounded />
+                <UiButton label="Log ind" size="large" submit />
+            </UiForm>
 
-            <UiButton
-                label="Log ind"
-                size="big"
-                @click="loginWithEmail(loginCodentials.mail, loginCodentials.password)"
-            />
-        </article>
+            <div class="divider"></div>
 
-        <div class="divider"></div>
-
-        <article>
             <UiButton
                 label="Prøv uden konto" 
-                styling="secondary" 
-                size="big"
+                type="secondary" 
+                size="large"
                 @click="loginAnonymously"
             />
-        </article>
 
-        <span class="small-text">
-            <p>* Som gæst kan du oprette og downloade fakturaer, men de bliver ikke gemt og kan ikke sendes via InvoiceMaker.</p>
-            <p>* InvoiceMaker er i øjeblikket under udvikling. Oprettelse af nye konti er derfor midlertidigt lukket. Hvis du ønsker en konto, er du velkommen til at kontakte os på mail@mail.com.</p>
-        </span>
+            <span class="small-text">
+                <p>* Som gæst kan du oprette og downloade fakturaer, men de bliver ikke gemt og kan ikke sendes via InvoiceMaker.</p>
+                <p>* InvoiceMaker er i øjeblikket under udvikling. Oprettelse af nye konti er derfor midlertidigt lukket. Hvis du ønsker en konto, er du velkommen til at kontakte os på mail@mail.com.</p>
+            </span>
+        </article>
     </section>
 </template>
 
@@ -73,29 +64,31 @@
 
         color: var(--text-color-1);
 
-        header {
+        &--text {
+            display: flex;
+            flex-direction: column;
             text-align: center;
         }
 
-        article {
+        &--content {
+            width: 100%;
             display: flex;
             flex-direction: column;
-            gap: 1rem;
-            width: 100%;
-        }
+            gap: 1.5rem;
 
-        .divider {
-            width: 100%;
-            height: 2px;
-            background-color: lightgrey;
-        }
+            .divider {
+                width: 100%;
+                height: 1px;
+                background-color: black;
+            }
 
-        .small-text {
-            display: flex;
-            flex-direction: column;
-            gap: .5rem;
-            font-size: .7rem;
-            font-style: italic;
+            .small-text {
+                display: flex;
+                flex-direction: column;
+                gap: .5rem;
+                font-size: .7rem;
+                font-style: italic;
+            }
         }
     }
 </style>
