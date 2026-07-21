@@ -14,9 +14,9 @@ const defaultInvoice = () => {
       created: today,
       due: dueDate,
       number: 0,
-      terms: 'Betaling netto kontant',
-      bank: 'Sparekassen Danmark 9070 - 1627436722',
-      reminder: 'RYKKERGEBYR Kr 100. - pr gang plus 2% i renter',
+      terms: '',
+      bank: '',
+      reminder: '',
       price: 0,
       tax: 0,
       total: 0,
@@ -143,17 +143,13 @@ export const useInvoice = () => {
   const resetInvoice = async () => {
     invoice.value = defaultInvoice()
 
-    if (import.meta.client) {
-      localStorage.removeItem('invoice')
-    }
-
-    await loadProfile()
-
     if (profile.value) {
       applyProfile(profile.value)
     }
 
     await loadNextInvoiceNumber()
+    
+    localStorage.removeItem('invoice')
   }
 
   const sendInvoice = async (input: string) => {

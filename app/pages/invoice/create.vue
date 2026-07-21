@@ -2,6 +2,10 @@
 import { useInvoice } from '~/composables/useInvoice';
 import { useProfile } from '~/composables/useProfile';
 import { useAuth } from '~/composables/useAuth';
+import SaveInvoicePage from '~/components/dialogs/saveInvoice.vue';
+import ResetInvoicePage from '~/components/dialogs/resetInvoice.vue';
+
+const dialog = useDialog();
 
 const { 
     invoice,
@@ -15,13 +19,11 @@ const {
     applyProfile, 
     loadNextInvoiceNumber, 
     saveInvoice,
-    sendInvoice,
     downloadInvoice,
 } = useInvoice()
 
 const { profile, loadProfile } = useProfile()
-const { isRegisteredUser } = useAuth()
-const { openDialog } = useDialog();
+const { isRegisteredUser, isAnonymous } = useAuth()
 
 definePageMeta({
     middleware: ['auth']
@@ -37,100 +39,106 @@ onMounted(async () => {
   await loadNextInvoiceNumber()
 })
 
-//DONE!
-const buttons = computed(() => [
-    { label: 'Ny faktura', styling: 'secondary', action:isRegisteredUser.value ? handleResetInvoice : resetInvoice, show: true},
-    { label: 'Gem & send', styling: 'secondary', action: handleSaveAndSendInvoice, show: isRegisteredUser.value },
-    { label: 'Download', action: downloadInvoice, show: true },
-].filter(item => item.show ?? true));
-
-//DONE!
-const handleResetInvoice = async () => {
-    const result = await openDialog({
-        title: 'Opret ny faktura',
-        message: 'Du er nu igang med at oprette ny fakura. vil du gemme det du allerede har lavet?',
-        actions: [
-            { label: 'Ja', value: 'accept', styling: 'cta' },
-            { label: 'Nej', value: 'decline', styling: 'danger' },
-        ]
-    })
-
-    switch(result) {
-        case 'accept':
-            saveInvoice()
-            return;
-        case 'decline':
-            resetInvoice();
-            return;
-    }
-}
-
-//DONE!
-const handleSaveAndSendInvoice = async () => {
-    const result:any = await openDialog({
-        title: 'Send faktura',
-        message: 'Det eneste vi nu er en email - indtast den nedenfor for at kommer videre!',
-        fields: [
-            { type: 'input', key: 'customerEmail', props: { type: 'email', placeholder: 'Fx. john@doe.com' } }
-        ],
-        actions: [
-            { label: 'Send', value: 'accept', styling: 'cta' },
-            { label: 'Annuler', value: 'decline', styling: 'danger' },
-        ]
-    })
-
-    switch(result.action) {
-        case 'accept':
+const handleSave = async () => {
+    const result: any = await dialog.open(SaveInvoicePage)
+    
+    switch(result?.value) {
+        case 'save':
             await saveInvoice()
-            // await sendInvoice(result.values.customerEmail)
             await resetInvoice()
-            return;
-        case 'decline':
-            return;
+            return  
+        case 'download':
+            await saveInvoice()
+            await downloadInvoice()
+            await resetInvoice()
+            return   
+        case 'cancle':
+            dialog.close()
+            return   
     }
 }
+const handleReset = async () => {
+    const result: any = await dialog.open(ResetInvoicePage)
+
+     switch(result?.value) {
+        case 'reset':
+            await resetInvoice()
+            return
+        case 'cancle':
+            dialog.close()
+            return
+     }
+}
+const handleDownload = async () => {
+   await downloadInvoice()
+}
+
+//DONE!
+const buttons: any = computed(() => [
+    { label: 'Ny faktura', type: 'secondary', show: true, action: handleReset},
+    { label: 'Gem', show: isRegisteredUser.value, action: handleSave },
+    { label: 'Download', show: isAnonymous.value, action: handleDownload },
+].filter(item => item.show ?? true));
 
 </script>
 
 <template>
-    <header class="invoice-header">
-        <h1>Opret faktura</h1>
-        <span>
-            <UiButton
-                v-for="btn in buttons"
-                :key="btn.label"
-                :label="btn.label"
-                :styling="btn.styling"
-                :show="btn.show"
-                @click="btn.action?.()"
-            />
-        </span>
-    </header>
+    <UiHeader>
+        <template #title>
+            <h1>Opret faktura</h1>
+        </template>
+    </UiHeader>
 
-    <section class="invoice-fields">
-        <article class="invoice-fields--customer">
-            <h2>Kunde oplysninger:</h2>
-            <span>
-                <UiInput label="Faktura nr:" type="number" placeholder="Fx. 100" v-model="invoice.invoiceDetails.number" rounded/>
-                <UiInput label="Kundens navn:" placeholder="Fx. John Doe" v-model="invoice.customer.name" rounded/>
-                <UiInput label="Kundens adresse:" placeholder="Fx. Vesterbro 1, 9000 Aalborg" v-model="invoice.customer.address" rounded/>
-                <UiInput label="Vedr:" placeholder="Fx. Renovering" v-model="invoice.invoiceDetails.heading" rounded/>
-            </span>
-        </article>
+    <section class="btns-wrapper">
+        <UiButton
+            v-for="btn in buttons"
+            :key="btn.label"
+            :label="btn.label"
+            :type="btn.type"
+            :show="btn.show"
+            @click="btn.action?.()"
+        />
+    </section>
 
-        <article class="invoice-fields--firm">
-            <h2>Virksomheds oplysninger:</h2>
-            <span>
-                <UiInput label="Virksomheds navn:" placeholder="Fx. Min butik" v-model="invoice.firm.name" rounded/>
-                <UiInput label="Virksomheds ejer:" placeholder="Fx. John Doe" v-model="invoice.firm.owner" rounded/>
-                <UiInput label="Virksomheds adresse:" placeholder="Fx. Vesterbro 2, 9000 Aalborg" v-model="invoice.firm.address" rounded/>
-                <UiInput label="Virksomheds telefon nr.:" placeholder="Fx. 10101010" v-model="invoice.firm.phone" rounded/>
-                <UiInput label="Virksomheds email:" placeholder="Fx. john.doe@mail.com" v-model="invoice.firm.email" rounded/>
-                <UiInput label="Virksomheds CVR:" placeholder="Fx. 10101010" v-model="invoice.firm.cvr" rounded/>
-            </span>
-        </article>
+    <UiForm class="invoice-fields">
+        <UiCard shadow rounded>
+            <UiHeader>
+                <template #title>
+                    <h2>Kunde oplysninger:</h2>
+                </template>
+            </UiHeader>
+        
+            <UiInput name="invoiceNumber" label="Faktura nr:" type="number" placeholder="Fx. 100" v-model="invoice.invoiceDetails.number" rounded/>
+            <UiInput name="customerName" label="Kundens navn:" placeholder="Fx. John Doe" v-model="invoice.customer.name" rounded/>
+            <UiInput name="customerAddress" label="Kundens adresse:" placeholder="Fx. Vesterbro 1, 9000 Aalborg" v-model="invoice.customer.address" rounded/>
+            <UiInput name="invoiceHeading" label="Vedr:" placeholder="Fx. Renovering" v-model="invoice.invoiceDetails.heading" rounded/>
+        </UiCard>
 
-        <article class="invoice-fields--items">
+        <UiCard rounded shadow>
+            <UiHeader>
+                <template #title>
+                    <h2>Virksomheds oplysninger:</h2>
+                </template>
+            </UiHeader>
+
+            <UiInput name="firmName" label="Virksomheds navn:" placeholder="Fx. Min butik" v-model="invoice.firm.name" rounded/>
+            <UiInput name="firmOwner" label="Virksomheds ejer:" placeholder="Fx. John Doe" v-model="invoice.firm.owner" rounded/>
+            <UiInput name="firmAddress" label="Virksomheds adresse:" placeholder="Fx. Vesterbro 2, 9000 Aalborg" v-model="invoice.firm.address" rounded/>
+            <UiInput name="firmPhone" label="Virksomheds telefon nr.:" placeholder="Fx. 10101010" v-model="invoice.firm.phone" rounded/>
+            <UiInput name="firmEmail" label="Virksomheds email:" placeholder="Fx. john.doe@mail.com" v-model="invoice.firm.email" rounded/>
+            <UiInput name="firmCVR" label="Virksomheds CVR:" placeholder="Fx. 10101010" v-model="invoice.firm.cvr" rounded/>
+
+            <UiHeader>
+                <template #title>
+                    <h3>Ekstra felter:</h3>
+                </template>
+            </UiHeader>
+                <UiInput name="firmTerms" placeholder="Fx. Betaling netto kontant" v-model="invoice.invoiceDetails.terms" rounded/>
+                <UiInput name="firmBank" placeholder="Fx. Sparekassen Danmark 0000 - 0000000000" v-model="invoice.invoiceDetails.bank" rounded/>
+                <UiInput name="firmReminder" placeholder="Fx. RYKKERGEBYR Kr 100. - pr gang plus 2% i renter" v-model="invoice.invoiceDetails.reminder" rounded/>
+        </UiCard>
+
+        <UiCard shadow rounded class="invoice-fields--items">
             <header>
                 <h2>Materialer</h2>
                 <UiButton
@@ -150,11 +158,11 @@ const handleSaveAndSendInvoice = async () => {
                 </thead>
                 <tbody>
                     <tr v-for="(item, itemIndex) in invoice.items">
-                        <td colspan="1"><UiInput placeholder="Fx. arbejdstimer" v-model="invoice.items[itemIndex]!.name" rounded/></td>
-                        <td colspan="1"><UiInput placeholder="Fx. 10" type="number" v-model="invoice.items[itemIndex]!.quantity" rounded/></td>
-                        <td colspan="1"><UiInput placeholder="Fx. 100" type="number" v-model="invoice.items[itemIndex]!.price" rounded/></td>
+                        <td colspan="1"><UiInput name="itemName" placeholder="Fx. arbejdstimer" v-model="invoice.items[itemIndex]!.name" transparent/></td>
+                        <td colspan="1"><UiInput name="itemCount" placeholder="Fx. 10" type="number" v-model="invoice.items[itemIndex]!.quantity" transparent/></td>
+                        <td colspan="1"><UiInput name="itemPrice" placeholder="Fx. 100" type="number" v-model="invoice.items[itemIndex]!.price" transparent/></td>
                         <td colspan="1">{{ getItemTotal(item) }} {{ invoice.invoiceDetails.currency }}</td>
-                        <td colspan="1"> <UiButton label="X" @click="removeItem(itemIndex)" styling="danger" size="small"/></td>
+                        <td colspan="1"> <UiButton label="X" @click="removeItem(itemIndex)" type="danger" size="medium"/></td>
                     </tr>
                 </tbody>
                 <tfoot>
@@ -172,21 +180,15 @@ const handleSaveAndSendInvoice = async () => {
                     </tr>
                 </tfoot>
             </table>
-        </article>
-    </section>
+        </UiCard>
+    </UiForm>
 </template>
 
 <style lang="scss" scoped>
-    .invoice-header {
+    .btns-wrapper {
         display: flex;
         flex-direction: row;
-        justify-content: space-between;
-
-        span {
-            display: flex;
-            flex-direction: row;
-            gap: 1rem;
-        }
+        gap: 1rem;
     }
 
     .invoice-fields {
@@ -198,33 +200,9 @@ const handleSaveAndSendInvoice = async () => {
         ;
         gap: 2rem;
 
-        &--customer { 
-            grid-area: customer;
-            display: flex;
-            flex-direction: column;
-            gap: 1rem;
-
-            span {
-                display: flex; flex-direction: column; gap: 1rem;
-            }
-        }
-
-        &--firm { 
-            grid-area: firm;
-            display: flex;
-            flex-direction: column;
-            gap: 1rem;
-
-            span {
-                display: flex; flex-direction: column; gap: 1rem;
-            } 
-        }
 
         &--items { 
             grid-area: items;
-            display: flex;
-            flex-direction: column;
-            gap: 1rem;
 
             header {
                 display: flex;

@@ -1,6 +1,9 @@
 <script setup>
 import { useDashboard } from '~/composables/useDashboard';
 import { useInvoice } from '~/composables/useInvoice';
+import invoiceOptions from '~/components/dialogs/invoiceOptions.vue';
+
+const dialog = useDialog();
 
 const { loadDashboard, dashboard} = useDashboard()
 const { invoice, downloadInvoice, resetInvoice} = useInvoice()
@@ -14,10 +17,6 @@ const createInvoice = async () => {
     await navigateTo('/invoice/create')
 }
 
-const testFunction = () => {
-    console.log('this is just a test');
-}
-
 const cards = [
     { title: 'Omæstning (denne måned)', value: dashboard?.value.stats.revenue + ' kr' || 'Loading...', icon: { name: 'document', size: 30, backgroundSize: 45, color: '#5C32E6', background: '#5C32E630' } },
     { title: 'Fakturaer (denne måned)', value: dashboard?.value.stats.invoiceCount + ' stk' || 'Loading...', icon: { name: 'check', size: 30, backgroundSize: 45, color: '#29781F', background: '#29781F30' } },
@@ -25,8 +24,8 @@ const cards = [
 
 const quickActions = [
     { title: 'Opret faktura', subTitle: 'Kom hurtigt igang med en ny faktura', action: createInvoice, icon: { name: 'pen', size: 30, backgroundSize: 45, color: '#5C32E6', background: '#5C32E630' } },
-    { title: 'Virksomhedsoplysninger', subTitle: 'Rediger dine virksomhedsoplysninger', action: testFunction, icon: { name: 'shop', size: 30, backgroundSize: 45, color: '#29781F', background: '#29781F30' } },
-    { title: 'Download seneste faktura', subTitle: 'Download PDF af seneste faktura', action: testFunction, icon: { name: 'download', size: 30, backgroundSize: 45, color: '#F5D95B', background: '#F5D95B30' } },
+    { title: 'Virksomhedsoplysninger', subTitle: 'Rediger dine virksomhedsoplysninger', icon: { name: 'shop', size: 30, backgroundSize: 45, color: '#29781F', background: '#29781F30' } },
+    { title: 'Download seneste faktura', subTitle: 'Download PDF af seneste faktura', icon: { name: 'download', size: 30, backgroundSize: 45, color: '#F5D95B', background: '#F5D95B30' } },
 ]
 
 onMounted(async () => {
@@ -37,6 +36,19 @@ const download = async (item) => {
     invoice.value = item.invoice;
     await downloadInvoice();
     await resetInvoice();
+}
+
+const invoiceClick = async (item) => {
+    const result = await dialog.open(invoiceOptions, { invoice: item })
+
+    switch(result?.value) {
+        case 'download':
+            await download(item)
+            return
+        case 'cancle':
+            dialog.close()
+            return
+    }
 }
 
 </script>
@@ -54,7 +66,6 @@ const download = async (item) => {
 
         <span>
             <UiButton label="Opret ny faktura" to="/invoice/create"/>
-            <p>Hurtigt, nemt og professionelt</p>
         </span>
     </div>
 
@@ -95,18 +106,18 @@ const download = async (item) => {
                             <th>Dato</th>
                             <th>Beløb</th>
                             <th>Status</th>
-                            <th>Action</th>
+                            <th>Handlinger</th>
                         </tr>
                     </thead>
 
                     <tbody>
-                        <tr v-for="invoice in dashboard.latestInvoices">
+                        <tr v-for="(invoice, index) in dashboard.latestInvoices" :key="index">
                             <th># {{ invoice.invoice_number }}</th>
                             <td>{{ invoice.customer_name }}</td>
                             <td>{{ invoice.invoice_date }}</td>
                             <td>{{ invoice.total }} DKK</td>
                             <td>{{ invoice.status }}</td>
-                            <td><UiButton label="Download" @click="download(invoice)"/></td>
+                            <td><UiButton label="Mere" @click="invoiceClick(invoice)"/></td>
                         </tr>
                     </tbody>
                 </table>
