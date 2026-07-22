@@ -18,8 +18,8 @@ const createInvoice = async () => {
 }
 
 const cards = [
-    { title: 'Omæstning (denne måned)', value: dashboard?.value.stats.revenue + ' kr' || 'Loading...', icon: { name: 'document', size: 30, backgroundSize: 45, color: '#5C32E6', background: '#5C32E630' } },
-    { title: 'Fakturaer (denne måned)', value: dashboard?.value.stats.invoiceCount + ' stk' || 'Loading...', icon: { name: 'check', size: 30, backgroundSize: 45, color: '#29781F', background: '#29781F30' } },
+    { title: 'Omæstning', value: dashboard?.value.stats.revenue + ' kr' || 'Loading...', icon: { name: 'document', size: 30, backgroundSize: 45, color: '#5C32E6', background: '#5C32E630' } },
+    { title: 'Fakturaer', value: dashboard?.value.stats.invoiceCount + ' stk' || 'Loading...', icon: { name: 'check', size: 30, backgroundSize: 45, color: '#29781F', background: '#29781F30' } },
 ];
 
 const quickActions = [
