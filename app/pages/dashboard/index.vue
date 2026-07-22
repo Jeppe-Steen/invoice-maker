@@ -24,8 +24,8 @@ const cards = [
 
 const quickActions = [
     { title: 'Opret faktura', subTitle: 'Kom hurtigt igang med en ny faktura', action: createInvoice, icon: { name: 'pen', size: 30, backgroundSize: 45, color: '#5C32E6', background: '#5C32E630' } },
-    { title: 'Virksomhedsoplysninger', subTitle: 'Rediger dine virksomhedsoplysninger', icon: { name: 'shop', size: 30, backgroundSize: 45, color: '#29781F', background: '#29781F30' } },
-    { title: 'Download seneste faktura', subTitle: 'Download PDF af seneste faktura', icon: { name: 'download', size: 30, backgroundSize: 45, color: '#F5D95B', background: '#F5D95B30' } },
+    // { title: 'Virksomhedsoplysninger', subTitle: 'Rediger dine virksomhedsoplysninger', icon: { name: 'shop', size: 30, backgroundSize: 45, color: '#29781F', background: '#29781F30' } },
+    // { title: 'Download seneste faktura', subTitle: 'Download PDF af seneste faktura', icon: { name: 'download', size: 30, backgroundSize: 45, color: '#F5D95B', background: '#F5D95B30' } },
 ]
 
 onMounted(async () => {
@@ -51,13 +51,27 @@ const invoiceClick = async (item) => {
     }
 }
 
+const greeting = computed(() => {
+  const hour = new Date().getHours()
+
+  if (hour < 12) {
+    return 'Godmorgen'
+  }
+
+  if (hour < 18) {
+    return 'God eftermiddag'
+  }
+
+  return 'Godaften'
+})
+
 </script>
 
 <template>
     <div class="header">
         <UiHeader>
             <template #subtitle>
-                <h1>God eftermiddag, Jeppe!</h1>
+                <h1>{{ greeting }} 👋</h1>
             </template>
             <template #title>
                 <p>Her er et overblik over din forretning og dine fakturaer</p>
