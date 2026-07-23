@@ -17,7 +17,7 @@
     <section class="login-container">
         <UiHeader centered>
             <template #title>
-                <h1>Velkommen til InvoiceMaker</h1>
+                <h1>Velkommen til Faktivo</h1>
             </template>
         </UiHeader>
 
@@ -43,8 +43,8 @@
             />
 
             <span class="small-text">
-                <p>* Som gæst kan du oprette og downloade fakturaer, men de bliver ikke gemt og kan ikke sendes via InvoiceMaker.</p>
-                <p>* InvoiceMaker er i øjeblikket under udvikling. Oprettelse af nye konti er derfor midlertidigt lukket. Hvis du ønsker en konto, er du velkommen til at kontakte os på mail@mail.com.</p>
+                <p>* Som gæst kan du oprette og downloade fakturaer, men de bliver ikke gemt og kan ikke sendes via Faktivo.</p>
+                <p>* Faktivo er i øjeblikket under udvikling. Oprettelse af nye konti er derfor midlertidigt lukket. Hvis du ønsker en konto, er du velkommen til at kontakte os på mail@mail.com.</p>
             </span>
         </article>
     </section>

@@ -32,7 +32,7 @@
 
         <span class="hero--description">
             <p>Slip for Word-skabeloner og manuelle beregninger.</p>
-            <p>InvoiceMaker hjælper dig med at oprette flotte fakturaer på få minutter.</p>
+            <p>Faktivo hjælper dig med at oprette flotte fakturaer på få minutter.</p>
         </span>
 
         <span class="hero--btns">

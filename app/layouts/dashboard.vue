@@ -12,7 +12,10 @@
 <template>
     <UiNavigation>
         <template #logo>
-            <h2>InvoiceMaker</h2>
+            <span class="logo">
+                <UiIcon name="document" size="30"/>
+                <h2>Faktivo</h2>
+            </span>
         </template>
 
         <template #links>
@@ -38,6 +41,10 @@
 </template>
 
 <style scoped lang="scss">
+    .logo {
+        display: flex; flex-direction: row; gap: .5rem;
+    }
+    
     .content-container {
         width: 100%;
         min-height: 100vh;
