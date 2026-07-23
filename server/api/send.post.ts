@@ -31,7 +31,7 @@ export default defineEventHandler(async (event) => {
   await browser.close()
 
   await resend.emails.send({
-    from: 'onboarding@resend.dev',
+    from: 'send@faktivo.dk',
     to: mail,
     subject: `Faktura ${invoice.invoiceDetails.number}`,
     html: '<p>Vedhæftet finder du din faktura.</p>',
