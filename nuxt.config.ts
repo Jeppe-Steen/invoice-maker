@@ -4,8 +4,8 @@ export default defineNuxtConfig({
   devtools: { enabled: true },
   modules: ['@jrs/core', '@nuxtjs/supabase'],
   supabase: {
-    url: 'https://atxybwuigiamqirknwmx.supabase.co',
-    key: 'sb_publishable_0cYXN_A5vgCpwIO5atkShw_DlbnDty7',
+    url: import.meta.env.NUXT_PUBLIC_SUPABASE_URL,
+    key: import.meta.env.NUXT_PUBLIC_SUPABASE_KEY,
     redirect: false,
   },
   css: [
