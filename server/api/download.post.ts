@@ -1,6 +1,7 @@
 import puppeteer from 'puppeteer'
 
 export default defineEventHandler(async (event) => {
+        const config = useRuntimeConfig()
         const invoice = await readBody(event)
 
         const encodedInvoice = encodeURIComponent(
@@ -12,7 +13,7 @@ export default defineEventHandler(async (event) => {
         const page = await browser.newPage()
 
         await page.goto(
-            `http://localhost:3000/invoice/preview?invoice=${encodedInvoice}`,
+            `${config.appUrl}/invoice/preview?invoice=${encodedInvoice}`,
             {
                 waitUntil: 'networkidle0'
             }

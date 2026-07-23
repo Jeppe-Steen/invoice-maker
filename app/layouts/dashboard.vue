@@ -13,7 +13,7 @@
     <UiNavigation>
         <template #logo>
             <span class="logo">
-                <UiIcon name="document" size="30"/>
+                <UiIcon name="document" size=30 />
                 <h2>Faktivo</h2>
             </span>
         </template>

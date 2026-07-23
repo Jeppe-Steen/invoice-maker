@@ -6,7 +6,8 @@ import puppeteer from 'puppeteer'
 const resend = new Resend(process.env.RESEND_API_KEY)
 
 export default defineEventHandler(async (event) => {
- const {invoice, mail} = await readBody(event)
+  const config = useRuntimeConfig()
+  const {invoice, mail} = await readBody(event)
 
   const encodedInvoice = encodeURIComponent(
     JSON.stringify(invoice)
@@ -17,7 +18,7 @@ export default defineEventHandler(async (event) => {
   const page = await browser.newPage()
 
   await page.goto(
-    `http://localhost:3000/invoice/preview?invoice=${encodedInvoice}`,
+    `${config.appUrl}/invoice/preview?invoice=${encodedInvoice}`,
     {
       waitUntil: 'networkidle0'
     }

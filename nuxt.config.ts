@@ -11,4 +11,7 @@ export default defineNuxtConfig({
   css: [
     '~/assets/theme.css'
   ],
+  runtimeConfig: {
+    appUrl: import.meta.env.NUXT_APP_URL || process.env.NUXT_APP_URL,
+  }
 })
