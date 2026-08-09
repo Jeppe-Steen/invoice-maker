@@ -19,12 +19,21 @@
     definePageMeta({
         layout: 'invoice'
     })
+
+    const formatDate = (date: string | Date) => {
+        return new Intl.DateTimeFormat('da-DK', {
+            day: '2-digit',
+            month: '2-digit',
+            year: 'numeric'
+        }).format(new Date(date))
+    }
 </script>
 
 <template>
     <section class="invoice-document">
         <header class="invoice-document--firm-customer">
             <div>
+                <p>Dato: {{ formatDate(invoice.invoiceDetails.created) }}</p>
                 <p>Faktura Nr: {{ invoice.invoiceDetails.number }}</p>
                 <br>
                 <p>{{ invoice.customer.name }}</p>

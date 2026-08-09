@@ -114,18 +114,24 @@ export const useInvoice = () => {
     invoice.value.invoiceDetails.reminder = profile.reminder
   }
 
+  const round2 = (value: number) => {
+    return Math.round((value + Number.EPSILON) * 100) / 100
+  }
+
   const subtotal = computed(() => {
-    return invoice.value.items.reduce((sum, item) => {
-      return sum + Number(item.quantity) * Number(item.price)
-    }, 0)
+    return round2(
+      invoice.value.items.reduce((sum, item) => {
+        return sum + Number(item.quantity) * Number(item.price)
+      }, 0)
+    )
   })
 
   const tax = computed(() => {
-    return subtotal.value * 0.25
+    return round2(subtotal.value * 0.25)
   })
 
   const total = computed(() => {
-    return subtotal.value + tax.value
+    return round2(subtotal.value + tax.value)
   })
 
   const addItem = () => {
@@ -204,7 +210,9 @@ export const useInvoice = () => {
   }
 
   const getItemTotal = (item: any) => {
-    return Number(item.price) * Number(item.quantity)
+    return round2(
+      Number(item.price) * Number(item.quantity)
+    )
   }
 
   return {
