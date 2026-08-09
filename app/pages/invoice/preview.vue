@@ -72,7 +72,14 @@
                     </tr>
                 </tbody>
 
-                <tfoot>
+                <tfoot v-if="!invoice.invoiceDetails.useTax">
+                    <tr>
+                        <th colspan="3">Pris</th>
+                        <th>{{ invoice.invoiceDetails.price }} {{ invoice.invoiceDetails.currency }}</th>
+                    </tr>
+                </tfoot>
+
+                <tfoot v-else>
                     <tr>
                         <th colspan="3">Pris eksl. moms</th>
                         <td>{{ invoice.invoiceDetails.price  }} {{ invoice.invoiceDetails.currency }}</td>

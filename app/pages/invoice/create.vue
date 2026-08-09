@@ -73,6 +73,10 @@ const handleDownload = async () => {
    await downloadInvoice()
 }
 
+const changeTax = () => {
+    invoice.value.invoiceDetails.useTax = !invoice.value.invoiceDetails.useTax
+}
+
 //DONE!
 const buttons: any = computed(() => [
     { label: 'Ny faktura', type: 'secondary', show: true, action: handleReset},
@@ -141,10 +145,18 @@ const buttons: any = computed(() => [
         <UiCard shadow rounded class="invoice-fields--items">
             <header>
                 <h2>Materialer</h2>
-                <UiButton
-                    label="Tilføj vare"
-                    @click="addItem"
-                />
+                <span :style="{display: 'flex', gap: '1rem', flexDirection: 'row'}">
+                    <UiButton
+                        :label="invoice.invoiceDetails.useTax ? 'Fjern moms' : 'Tilføj moms'"
+                        @click="changeTax"
+                        type="secondary"
+                    />
+                    
+                    <UiButton
+                        label="Tilføj vare"
+                        @click="addItem"
+                    />
+                </span>
             </header>
 
             <table>
@@ -165,7 +177,15 @@ const buttons: any = computed(() => [
                         <td colspan="1"> <UiButton label="X" @click="removeItem(itemIndex)" type="danger" size="medium"/></td>
                     </tr>
                 </tbody>
-                <tfoot>
+
+                <tfoot v-if="!invoice.invoiceDetails.useTax">
+                    <tr>
+                        <th colspan="3">Pris</th>
+                        <th>{{ subtotal }} {{ invoice.invoiceDetails.currency }}</th>
+                    </tr>
+                </tfoot>
+
+                <tfoot v-else>
                     <tr>
                         <th colspan="3">Pris eksl. moms</th>
                         <td>{{ subtotal }} {{ invoice.invoiceDetails.currency }}</td>

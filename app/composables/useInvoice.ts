@@ -22,6 +22,7 @@ const defaultInvoice = () => {
       total: 0,
       currency: 'DKK',
       heading: '',
+      useTax: true,
     },
     firm: {
       name: '',
