@@ -33,8 +33,7 @@ onMounted(async () => {
 })
 
 const download = async (item) => {
-    invoice.value = item.invoice;
-    await downloadInvoice();
+    await downloadInvoice(item);
     await resetInvoice();
 }
 
@@ -64,6 +63,14 @@ const greeting = computed(() => {
 
   return 'Godaften'
 })
+
+const formatDate = (date) => {
+    return new Intl.DateTimeFormat('da-DK', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric'
+    }).format(new Date(date))
+}
 
 </script>
 
@@ -126,11 +133,11 @@ const greeting = computed(() => {
 
                     <tbody>
                         <tr v-for="(invoice, index) in dashboard.latestInvoices" :key="index">
-                            <th># {{ invoice.invoice_number }}</th>
-                            <td>{{ invoice.customer_name }}</td>
-                            <td>{{ invoice.invoice_date }}</td>
-                            <td>{{ invoice.total }} DKK</td>
-                            <td>{{ invoice.status }}</td>
+                            <th># {{ invoice?.invoice_number }}</th>
+                            <td>{{ invoice?.customer_name }}</td>
+                            <td>{{ formatDate(invoice?.created_at) }}</td>
+                            <td>{{ invoice?.total }} DKK</td>
+                            <td>{{ invoice?.status }}</td>
                             <td><UiButton label="Mere" @click="invoiceClick(invoice)"/></td>
                         </tr>
                     </tbody>

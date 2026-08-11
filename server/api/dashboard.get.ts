@@ -22,10 +22,14 @@ export default defineEventHandler(async (event) => {
             id,
             invoice_number,
             customer_name,
-            invoice_date,
+            customer_email,
+            subtotal,
+            tax,
             total,
             status,
-            invoice
+            is_active,
+            created_at,
+            invoice_data
         `)
         .order('created_at', { ascending: false })
         .limit(5)

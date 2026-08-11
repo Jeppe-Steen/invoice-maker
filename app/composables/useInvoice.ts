@@ -10,21 +10,15 @@ const defaultInvoice = () => {
   dueDate.setDate(dueDate.getDate() + 14)
 
   return {
-    invoiceDetails: {
+    details: {
+      number: 0,
       created: today,
       due: dueDate,
-      number: 0,
-      terms: '',
-      bank: '',
-      reminder: '',
-      price: 0,
-      tax: 0,
-      total: 0,
-      currency: 'DKK',
+      showDueDate: true,
       heading: '',
-      useTax: true,
     },
-    firm: {
+
+    seller: {
       name: '',
       owner: '',
       address: '',
@@ -32,17 +26,38 @@ const defaultInvoice = () => {
       email: '',
       cvr: '',
     },
+
     customer: {
       name: '',
       address: '',
+      email: '',
+      cvr: '',
     },
+
     items: [
       {
-        name: 'Test',
-        quantity: 0,
-        price: 0,
-      },
+        name: '',
+        quantity: 1,
+        unitPrice: 0,
+      }
     ],
+
+    tax: {
+      enabled: true,
+      rate: 25,
+    },
+
+    payment: {
+      terms: '',
+
+      bank: {
+        name: '',
+        registrationNumber: '',
+        accountNumber: '',
+      },
+
+      reminder: '',
+    }
   }
 }
 
@@ -50,7 +65,8 @@ export const useInvoice = () => {
   const invoice = useState('invoice', () => defaultInvoice());
   const initialized = useState('initialized', () => false);
   const supabase = useSupabaseClient()
-  const { profile, loadProfile } = useProfile()
+
+  const { profile } = useProfile()
 
   onMounted(() => {
     const savedInvoice = localStorage.getItem('invoice')
@@ -59,7 +75,6 @@ export const useInvoice = () => {
       invoice.value = JSON.parse(savedInvoice)
     }
 
-    // sørg for watch kun én gang
     if (!initialized.value) {
       watch(
         invoice,
@@ -79,7 +94,7 @@ export const useInvoice = () => {
     } = await supabase.auth.getUser()
 
     if (!user || user.is_anonymous) {
-      invoice.value.invoiceDetails.number = 1
+      invoice.value.details.number = 1
       return
     }
 
@@ -98,21 +113,23 @@ export const useInvoice = () => {
       return
     }
 
-    invoice.value.invoiceDetails.number = lastInvoice
+    invoice.value.details.number = lastInvoice
       ? lastInvoice.invoice_number + 1
       : 1
   }
 
   const applyProfile = (profile: any) => {
-    invoice.value.firm.name = profile.company_name
-    invoice.value.firm.owner = profile.owner_name
-    invoice.value.firm.address = profile.address
-    invoice.value.firm.phone = profile.phone
-    invoice.value.firm.email = profile.email
-    invoice.value.firm.cvr = profile.cvr
-    invoice.value.invoiceDetails.terms = profile.terms
-    invoice.value.invoiceDetails.bank = profile.bank
-    invoice.value.invoiceDetails.reminder = profile.reminder
+    invoice.value.seller.name = profile.company_name
+    invoice.value.seller.owner = profile.owner_name
+    invoice.value.seller.address = profile.address
+    invoice.value.seller.phone = profile.phone
+    invoice.value.seller.email = profile.email
+    invoice.value.seller.cvr = profile.cvr
+    invoice.value.payment.bank.name = profile.bank_name
+    invoice.value.payment.bank.registrationNumber = profile.bank_registration_number
+    invoice.value.payment.bank.accountNumber = profile.bank_account_number
+    invoice.value.payment.terms = profile.payment_terms
+    invoice.value.payment.reminder = profile.reminder_text
   }
 
   const round2 = (value: number) => {
@@ -122,24 +139,36 @@ export const useInvoice = () => {
   const subtotal = computed(() => {
     return round2(
       invoice.value.items.reduce((sum, item) => {
-        return sum + Number(item.quantity) * Number(item.price)
+        return sum + Number(item.quantity) * Number(item.unitPrice)
       }, 0)
     )
   })
 
   const tax = computed(() => {
-    return round2(subtotal.value * 0.25)
+    if (!invoice.value.tax.enabled) {
+      return 0
+    }
+
+    return round2(
+      subtotal.value * (invoice.value.tax.rate / 100)
+    )
   })
 
   const total = computed(() => {
     return round2(subtotal.value + tax.value)
   })
 
+  const totals = computed(() => ({
+    subtotal: subtotal.value,
+    tax: tax.value,
+    total: total.value
+  }))
+
   const addItem = () => {
     invoice.value.items.push({
-      name: 'Ny vare',
+      name: '',
       quantity: 1,
-      price: 0
+      unitPrice: 0
     })
   }
 
@@ -161,41 +190,41 @@ export const useInvoice = () => {
 
   const sendInvoice = async (input: string) => {
     await $fetch('/api/send', {
-        method: 'POST',
-        body: {
-          invoice: invoice.value,
-          mail: input
-        }
+      method: 'POST',
+      body: {
+        invoice: invoice.value,
+        totals: totals.value,
+        mail: input
+      }
     })
   }
 
   const saveInvoice = async () => {
-    invoice.value.invoiceDetails.price = subtotal.value
-    invoice.value.invoiceDetails.tax = tax.value
-    invoice.value.invoiceDetails.total = total.value
 
     await $fetch('/api/save', {
         method: 'POST',
         body: {
           invoice: invoice.value,
-          subtotal: subtotal.value,
-          tax: tax.value,
-          total: total.value
+          totals: totals.value
         }
       })
   }
 
-  const downloadInvoice = async () => {
-    invoice.value.invoiceDetails.price = subtotal.value
-    invoice.value.invoiceDetails.tax = tax.value
-    invoice.value.invoiceDetails.total = total.value
-    
+  const downloadInvoice = async (item: any) => {
+
     const response = await fetch('/api/download', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(invoice.value)
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        invoice: item.invoice_data,
+        totals: {
+          subtotal: item.subtotal,
+          tax: item.tax,
+          total: item.total
+        }
+      })
     })
 
     const blob = await response.blob()
@@ -204,7 +233,7 @@ export const useInvoice = () => {
 
     const a = document.createElement('a')
     a.href = url
-    a.download = `faktura-`+ invoice.value.invoiceDetails.number + `.pdf`
+    a.download = `faktura-${item.invoice_number}.pdf`
     a.click()
 
     URL.revokeObjectURL(url)
@@ -212,16 +241,19 @@ export const useInvoice = () => {
 
   const getItemTotal = (item: any) => {
     return round2(
-      Number(item.price) * Number(item.quantity)
+      Number(item.unitPrice) * Number(item.quantity)
     )
   }
 
   return {
     invoice,
     initialized,
+
     subtotal,
     tax,
     total,
+    totals,
+
     getItemTotal,
 
     addItem,

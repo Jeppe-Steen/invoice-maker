@@ -16,7 +16,7 @@ const {
     addItem, 
     removeItem, 
     resetInvoice, 
-    applyProfile, 
+    applyProfile,
     loadNextInvoiceNumber, 
     saveInvoice,
     downloadInvoice,
@@ -74,7 +74,7 @@ const handleDownload = async () => {
 }
 
 const changeTax = () => {
-    invoice.value.invoiceDetails.useTax = !invoice.value.invoiceDetails.useTax
+    invoice.value.tax.enabled = !invoice.value.tax.enabled
 }
 
 //DONE!
@@ -112,10 +112,12 @@ const buttons: any = computed(() => [
                 </template>
             </UiHeader>
         
-            <UiInput name="invoiceNumber" label="Faktura nr:" type="number" placeholder="Fx. 100" v-model="invoice.invoiceDetails.number" rounded/>
-            <UiInput name="customerName" label="Kundens navn:" placeholder="Fx. John Doe" v-model="invoice.customer.name" rounded/>
-            <UiInput name="customerAddress" label="Kundens adresse:" placeholder="Fx. Vesterbro 1, 9000 Aalborg" v-model="invoice.customer.address" rounded/>
-            <UiInput name="invoiceHeading" label="Vedr:" placeholder="Fx. Renovering" v-model="invoice.invoiceDetails.heading" rounded/>
+            <UiInput name="invoiceNumber" label="Faktura nr:" type="number" placeholder="Fx. 100" v-model="invoice.details.number" rounded/>
+            <UiInput name="customerName" label="Navn:" placeholder="Fx. John Doe" v-model="invoice.customer.name" rounded/>
+            <UiInput name="customerAddress" label="Adresse:" placeholder="Fx. Vesterbro 1, 9000 Aalborg" v-model="invoice.customer.address" rounded/>
+            <UiInput name="customerEmail" label="Email:" placeholder="Fx. john.doe@mail.com" v-model="invoice.customer.email" rounded/>
+            <UiInput name="customerCVR" label="CVR:" placeholder="Fx. 10101010" v-model="invoice.customer.cvr" rounded/>
+            <UiInput name="invoiceHeading" label="Vedr:" placeholder="Fx. Renovering" v-model="invoice.details.heading" rounded/>
         </UiCard>
 
         <UiCard rounded shadow>
@@ -125,21 +127,27 @@ const buttons: any = computed(() => [
                 </template>
             </UiHeader>
 
-            <UiInput name="firmName" label="Virksomheds navn:" placeholder="Fx. Min butik" v-model="invoice.firm.name" rounded/>
-            <UiInput name="firmOwner" label="Virksomheds ejer:" placeholder="Fx. John Doe" v-model="invoice.firm.owner" rounded/>
-            <UiInput name="firmAddress" label="Virksomheds adresse:" placeholder="Fx. Vesterbro 2, 9000 Aalborg" v-model="invoice.firm.address" rounded/>
-            <UiInput name="firmPhone" label="Virksomheds telefon nr.:" placeholder="Fx. 10101010" v-model="invoice.firm.phone" rounded/>
-            <UiInput name="firmEmail" label="Virksomheds email:" placeholder="Fx. john.doe@mail.com" v-model="invoice.firm.email" rounded/>
-            <UiInput name="firmCVR" label="Virksomheds CVR:" placeholder="Fx. 10101010" v-model="invoice.firm.cvr" rounded/>
+            <UiInput name="firmName" label="Virksomheds navn:" placeholder="Fx. Min butik" v-model="invoice.seller.name" rounded/>
+            <UiInput name="firmOwner" label="Ejer:" placeholder="Fx. John Doe" v-model="invoice.seller.owner" rounded/>
+            <UiInput name="firmAddress" label="Adresse:" placeholder="Fx. Vesterbro 2, 9000 Aalborg" v-model="invoice.seller.address" rounded/>
+            <UiInput name="firmPhone" label="Telefon nr.:" placeholder="Fx. 10101010" v-model="invoice.seller.phone" rounded/>
+            <UiInput name="firmEmail" label="Email:" placeholder="Fx. john.doe@mail.com" v-model="invoice.seller.email" rounded/>
+            <UiInput name="firmCVR" label="CVR:" placeholder="Fx. 10101010" v-model="invoice.seller.cvr" rounded/>
 
             <UiHeader>
                 <template #title>
                     <h3>Ekstra felter:</h3>
                 </template>
             </UiHeader>
-                <UiInput name="firmTerms" placeholder="Fx. Betaling netto kontant" v-model="invoice.invoiceDetails.terms" rounded/>
-                <UiInput name="firmBank" placeholder="Fx. Sparekassen Danmark 0000 - 0000000000" v-model="invoice.invoiceDetails.bank" rounded/>
-                <UiInput name="firmReminder" placeholder="Fx. RYKKERGEBYR Kr 100. - pr gang plus 2% i renter" v-model="invoice.invoiceDetails.reminder" rounded/>
+                <UiInput name="paymentTerms" label="Betalingsbetingelser:" placeholder="Fx. Betaling netto kontant" v-model="invoice.payment.terms" rounded/>
+                <UiInput name="bakName" label="Bank navn:" placeholder="Fx. Sparekassen Danmark" v-model="invoice.payment.bank.name" rounded/>
+
+                <span :style="{display: 'flex', gap: '1rem', flexDirection: 'row'}">
+                    <UiInput name="registrationNumber" label="Reg. nr." type="number" placeholder="Fx. 0000" v-model="invoice.payment.bank.registrationNumber" rounded/>
+                    <UiInput name="accountNumber" label="Kontonr." type="number" placeholder="Fx. 0000000000" v-model="invoice.payment.bank.accountNumber" rounded/>
+                </span>
+
+                <UiInput name="paymentReminder" label="Betalingspåmindelse:" placeholder="Fx. RYKKERGEBYR Kr 100. - pr gang plus 2% i renter" v-model="invoice.payment.reminder" rounded/>
         </UiCard>
 
         <UiCard shadow rounded class="invoice-fields--items">
@@ -147,7 +155,7 @@ const buttons: any = computed(() => [
                 <h2>Materialer</h2>
                 <span :style="{display: 'flex', gap: '1rem', flexDirection: 'row'}">
                     <UiButton
-                        :label="invoice.invoiceDetails.useTax ? 'Fjern moms' : 'Tilføj moms'"
+                        :label="invoice.tax.enabled ? 'Fjern moms' : 'Tilføj moms'"
                         @click="changeTax"
                         type="secondary"
                     />
@@ -172,31 +180,31 @@ const buttons: any = computed(() => [
                     <tr v-for="(item, itemIndex) in invoice.items">
                         <td colspan="1"><UiInput name="itemName" placeholder="Fx. arbejdstimer" v-model="invoice.items[itemIndex]!.name" transparent/></td>
                         <td colspan="1"><UiInput name="itemCount" placeholder="Fx. 10" type="number" v-model="invoice.items[itemIndex]!.quantity" transparent/></td>
-                        <td colspan="1"><UiInput name="itemPrice" placeholder="Fx. 100" type="number" v-model="invoice.items[itemIndex]!.price" transparent/></td>
-                        <td colspan="1">{{ getItemTotal(item) }} {{ invoice.invoiceDetails.currency }}</td>
+                        <td colspan="1"><UiInput name="itemPrice" placeholder="Fx. 100" type="number" v-model="invoice.items[itemIndex]!.unitPrice" transparent/></td>
+                        <td colspan="1">{{ getItemTotal(item) }} kr</td>
                         <td colspan="1"> <UiButton label="X" @click="removeItem(itemIndex)" type="danger" size="medium"/></td>
                     </tr>
                 </tbody>
 
-                <tfoot v-if="!invoice.invoiceDetails.useTax">
+                <tfoot v-if="!invoice.tax.enabled">
                     <tr>
                         <th colspan="3">Pris</th>
-                        <th>{{ subtotal }} {{ invoice.invoiceDetails.currency }}</th>
+                        <th>{{ subtotal }} kr</th>
                     </tr>
                 </tfoot>
 
                 <tfoot v-else>
                     <tr>
                         <th colspan="3">Pris eksl. moms</th>
-                        <td>{{ subtotal }} {{ invoice.invoiceDetails.currency }}</td>
+                        <td>{{ subtotal }} kr</td>
                     </tr>
                     <tr>
                         <th colspan="3">Moms</th>
-                        <td>{{ tax }} {{ invoice.invoiceDetails.currency }}</td>
+                        <td>{{ tax }} kr</td>
                     </tr>
                     <tr>
                         <th colspan="3">Pris incl. moms</th>
-                        <th>{{ total }} {{ invoice.invoiceDetails.currency }}</th>
+                        <th>{{ total }} kr</th>
                     </tr>
                 </tfoot>
             </table>
